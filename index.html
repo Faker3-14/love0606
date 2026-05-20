@@ -45,7 +45,7 @@
         .content{
             min-height:100vh;
             background:linear-gradient(#fbcfe8,#fff);
-            padding:40px 20px;text-align:center;
+            padding:40px 20px;text-align:center;position:relative;
         }
         .couple-name{
             font-size:36px;margin:20px 0;color:#c8102e;
@@ -56,7 +56,7 @@
         .memo{
             font-size:18px;margin:12px 0;color:#555;line-height:1.8
         }
-        .date-box,.period-box,.fun-box{
+        .date-box,.period-box,.fun-box,.wish-box,.game-box{
             margin-top:30px;padding:24px;
             background:rgba(255,255,255,0.75);border-radius:18px;
         }
@@ -65,6 +65,38 @@
         }
         .btn{
             margin:8px;padding:10px 18px;background:#f43f5e;color:white;border:none;border-radius:12px;font-size:15px;
+        }
+        .wish-item{
+            display:flex;align-items:center;margin:8px 0;text-align:left;
+        }
+        .wish-item input{
+            width:20px;margin-right:10px;margin-bottom:0;
+        }
+        .wheel{
+            width:200px;height:200px;border-radius:50%;border:8px solid #f43f5e;
+            margin:20px auto;position:relative;overflow:hidden;
+        }
+        .wheel-sector{
+            position:absolute;width:50%;height:50%;transform-origin:bottom right;
+            display:flex;align-items:center;justify-content:center;
+        }
+        .wheel-text{
+            transform:rotate(45deg);font-size:12px;font-weight:bold;
+        }
+        .falling-heart{
+            position:fixed;top:-10%;color:#f43f5e;animation:fall 10s linear infinite;
+            z-index:0;pointer-events:none;
+        }
+        @keyframes fall{
+            to{transform:translateY(110vh) rotate(360deg)}
+        }
+        .click-heart{
+            position:absolute;color:#f43f5e;animation:pop 1s ease-out forwards;
+            pointer-events:none;
+        }
+        @keyframes pop{
+            0%{transform:scale(0);opacity:1}
+            100%{transform:scale(2);opacity:0}
         }
     </style>
 </head>
@@ -84,10 +116,21 @@ const correct = "0329";
 const togetherStart = new Date("2026-05-21");
 const birthdaySister = new Date(new Date().getFullYear()+"-06-06");
 const birthdayMe = new Date(new Date().getFullYear()+"-03-29");
+// 下次见面日期，自己改！
+const nextMeet = new Date("2026-05-21");
 
 let lastPeriod = localStorage.getItem("lastPeriod") || "2025-05-06";
 const cycle = 28;
 let missCount = Number(localStorage.getItem("missCount")) || 0;
+let loveDays = Number(localStorage.getItem("loveDays")) || 0;
+let lastLoveDate = localStorage.getItem("lastLoveDate") || "";
+let wishes = JSON.parse(localStorage.getItem("wishes")) || [
+    {text:"一起看一场电影",done:false},
+    {text:"一起吃一顿火锅",done:false},
+    {text:"一起去海边散步",done:false},
+    {text:"一起拍一组情侣照",done:false},
+    {text:"一起去游乐园",done:false}
+];
 
 // 随机情话库
 const loveWords = [
@@ -97,7 +140,7 @@ const loveWords = [
     "遇见姐姐，是我这辈子最大的幸运",
     "姐姐你今天好piu 亮啊！！亲亲",
     "姐姐！姐姐！要香香~嘻嘻嘻",
-    "姐姐十天，姐姐是地，绝对不要惹姐姐生气！！！！"
+    "姐姐是天，姐姐是地，绝对不要惹姐姐生气！！！！"
 ];
 
 // 今日情侣运势
@@ -106,6 +149,18 @@ const luckList = [
     "🥰 宠溺模式：今天要无条件宠姐姐",
     "💞 心动模式：今天会格外想念对方",
     "✨ 安稳模式：平平淡淡，一直相爱"
+];
+
+// 真心话大冒险选项
+const truthDare = [
+    "真心话：你最喜欢我哪一点？",
+    "大冒险：亲对方一下",
+    "真心话：你第一次见我是什么感觉？",
+    "大冒险：说一句最肉麻的情话",
+    "真心话：你想我了吗？",
+    "大冒险：抱对方10秒钟",
+    "真心话：你觉得我哪里最可爱？",
+    "大冒险：给对方唱首歌"
 ];
 
 // 在一起时间
@@ -141,6 +196,36 @@ function getPeriodTips(){
     return {nextDays,status,color};
 }
 
+// 背景爱心飘落
+function initFallingHearts(){
+    setInterval(()=>{
+        const heart = document.createElement("div");
+        heart.className = "falling-heart";
+        heart.innerText = "❤️";
+        heart.style.left = Math.random()*100 + "vw";
+        heart.style.animationDuration = (Math.random()*5+5) + "s";
+        heart.style.fontSize = (Math.random()*10+10) + "px";
+        document.body.appendChild(heart);
+        setTimeout(()=>heart.remove(),15000);
+    },500);
+}
+
+// 点击屏幕冒爱心
+function initClickHearts(){
+    document.addEventListener("click",(e)=>{
+        for(let i=0;i<3;i++){
+            const heart = document.createElement("div");
+            heart.className = "click-heart";
+            heart.innerText = "❤️";
+            heart.style.left = e.clientX + "px";
+            heart.style.top = e.clientY + "px";
+            heart.style.fontSize = (Math.random()*10+15) + "px";
+            document.body.appendChild(heart);
+            setTimeout(()=>heart.remove(),1000);
+        }
+    });
+}
+
 function check(){
     let val = document.getElementById('pwd').value;
     if(val === correct){
@@ -153,9 +238,12 @@ function check(){
             if(birthSisterLeft < 0) birthSisterLeft += 365;
             let birthMeLeft = Math.ceil((birthdayMe - now) / (1000*60*60*24));
             if(birthMeLeft < 0) birthMeLeft += 365;
+            const meetLeft = Math.max(0, Math.ceil((nextMeet - now) / (1000*60*60*24)));
             const periodInfo = getPeriodTips();
             const randomWord = loveWords[Math.floor(Math.random()*loveWords.length)];
             const todayLuck = luckList[Math.floor(Math.random()*luckList.length)];
+            const today = now.toDateString();
+            const canLove = today !== lastLoveDate;
 
             document.getElementById('page').innerHTML = `
             <div class="content">
@@ -170,6 +258,7 @@ function check(){
                 <div class="date-box">
                     <p class="date-title">💌 我们的专属纪念日</p>
                     <p class="memo">和姐姐正式开始：2026.05.21</p>
+                    <p class="memo">距离下次见面：还有 ${meetLeft} 天</p>
                     <p class="memo">姐姐生日(06.06)：还有 ${birthSisterLeft} 天</p>
                     <p class="memo">我的生日(03.29)：还有 ${birthMeLeft} 天</p>
                 </div>
@@ -187,10 +276,43 @@ function check(){
                     <p class="memo">今日情话：${randomWord}</p>
                     <p class="memo">今日运势：${todayLuck}</p>
                     <p class="memo">我已经想姐姐 <span id="miss-num">${missCount}</span> 次啦</p>
+                    <p class="memo">连续说我爱你：${loveDays} 天</p>
                     <button class="btn" onclick="addMiss()">💓 又想姐姐了 +1</button>
                     <button class="btn" onclick="refreshWord()">💌 换一句情话</button>
+                    <button class="btn" onclick="sayLove()" ${!canLove?"disabled":""}>💕 今日说我爱你</button>
+                </div>
+
+                <div class="wish-box">
+                    <p class="date-title">📝 我们的心愿清单</p>
+                    <div id="wish-list"></div>
+                </div>
+
+                <div class="game-box">
+                    <p class="date-title">🎮 真心话大冒险</p>
+                    <div class="wheel" id="wheel">
+                        <div class="wheel-sector" style="transform:rotate(0deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
+                        <div class="wheel-sector" style="transform:rotate(45deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
+                        <div class="wheel-sector" style="transform:rotate(90deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
+                        <div class="wheel-sector" style="transform:rotate(135deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
+                        <div class="wheel-sector" style="transform:rotate(180deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
+                        <div class="wheel-sector" style="transform:rotate(225deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
+                        <div class="wheel-sector" style="transform:rotate(270deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
+                        <div class="wheel-sector" style="transform:rotate(315deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
+                    </div>
+                    <button class="btn" onclick="spinWheel()">🎲 开始转动</button>
+                    <p id="game-result" class="memo" style="margin-top:15px;font-weight:bold"></p>
                 </div>
             </div>`;
+
+            // 渲染心愿清单
+            const wishList = document.getElementById("wish-list");
+            wishes.forEach((wish,index)=>{
+                wishList.innerHTML += `
+                <div class="wish-item">
+                    <input type="checkbox" id="wish-${index}" ${wish.done?"checked":""} onchange="toggleWish(${index})">
+                    <label for="wish-${index}">${wish.text}</label>
+                </div>`;
+            });
 
             // 想念次数+1
             window.addMiss = function(){
@@ -202,6 +324,33 @@ function check(){
             window.refreshWord = function(){
                 location.reload();
             }
+            // 今日说我爱你
+            window.sayLove = function(){
+                if(canLove){
+                    loveDays++;
+                    lastLoveDate = today;
+                    localStorage.setItem("loveDays",loveDays);
+                    localStorage.setItem("lastLoveDate",lastLoveDate);
+                    alert("❤️ 我爱你！今天的爱意已收到～");
+                    location.reload();
+                }
+            }
+            // 切换心愿完成状态
+            window.toggleWish = function(index){
+                wishes[index].done = !wishes[index].done;
+                localStorage.setItem("wishes",JSON.stringify(wishes));
+            }
+            // 转动转盘
+            window.spinWheel = function(){
+                const wheel = document.getElementById("wheel");
+                const angle = Math.random()*360 + 1440;
+                wheel.style.transition = "transform 4s ease-out";
+                wheel.style.transform = `rotate(${angle}deg)`;
+                setTimeout(()=>{
+                    const result = truthDare[Math.floor(Math.random()*truthDare.length)];
+                    document.getElementById("game-result").innerText = result;
+                },4000);
+            }
 
             // 更新生理期
             document.getElementById("period-date").onchange = (e)=>{
@@ -210,6 +359,10 @@ function check(){
                 alert("✅ 生理期已更新");
                 location.reload();
             }
+
+            // 初始化特效
+            initFallingHearts();
+            initClickHearts();
         },3000);
     }else{
         alert("密码不对～只有黄帝大人才能进来哦");
