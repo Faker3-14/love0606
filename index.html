@@ -6,7 +6,7 @@
     <title>❤️ is黄黄 & Han仔 专属秘密 ❤️</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{margin:0;overflow-x:hidden;padding-bottom:120px}
+        body{margin:0;overflow-x:hidden}
         .login{
             min-height:100vh;
             display:flex;align-items:center;justify-content:center;
@@ -84,14 +84,11 @@
             transform:rotate(45deg);font-size:12px;font-weight:bold;
         }
 
-        /* ========== 电子小狗宠物 ========== */
-        .pet-container{
-            position:fixed;bottom:20px;left:0;right:0;z-index:999;
-            pointer-events:none;
-        }
+        /* ========== 超级电子小狗 ========== */
         .pet{
-            position:absolute;bottom:0;pointer-events:auto;cursor:pointer;
-            transition:transform 0.3s;
+            position:fixed;z-index:999;cursor:pointer;
+            transition:all 0.5s ease;
+            user-select:none;
         }
         .dog-body{
             width:60px;height:40px;background:#f9a826;border-radius:30px;
@@ -124,16 +121,38 @@
             animation:wag 1s infinite alternate;
         }
         .pet-status{
-            position:absolute;top:-30px;left:50%;transform:translateX(-50%);
-            background:#fff;padding:4px 8px;border-radius:8px;font-size:12px;
-            white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,0.1);
+            position:absolute;top:-40px;left:50%;transform:translateX(-50%);
+            background:#fff;padding:6px 10px;border-radius:12px;font-size:12px;
+            white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.15);
+            animation:bubble 0.3s ease;
+        }
+        .pet-bubble{
+            position:absolute;top:-70px;left:50%;transform:translateX(-50%);
+            background:#fff;padding:8px 12px;border-radius:16px;font-size:13px;
+            white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.15);
+            animation:bubble 0.5s ease;
+            max-width:200px;
         }
         @keyframes wag{
             0%{transform:rotate(-20deg)}
             100%{transform:rotate(20deg)}
         }
+        @keyframes bubble{
+            0%{transform:translateX(-50%) scale(0);opacity:0}
+            100%{transform:translateX(-50%) scale(1);opacity:1}
+        }
+        @keyframes dance{
+            0%{transform:rotate(0deg) translateY(0)}
+            25%{transform:rotate(-15deg) translateY(-10px)}
+            50%{transform:rotate(0deg) translateY(0)}
+            75%{transform:rotate(15deg) translateY(-10px)}
+            100%{transform:rotate(0deg) translateY(0)}
+        }
+        .pet.dancing{
+            animation:dance 0.5s infinite;
+        }
         .pet.happy .dog-tail{
-            animation-duration:0.3s;
+            animation-duration:0.2s;
         }
     </style>
 </head>
@@ -169,10 +188,28 @@ let wishes = JSON.parse(localStorage.getItem("wishes")) || [
     {text:"一起去游乐园",done:false}
 ];
 
-// 电子小狗状态
-let petHappiness = Number(localStorage.getItem("petHappiness")) || 100;
-let petPosition = 50;
-let petDirection = 1;
+// 电子小狗超级系统
+let petHappiness = Number(localStorage.getItem("petHappiness")) || 50;
+let petLevel = Number(localStorage.getItem("petLevel")) || 1;
+let petExp = Number(localStorage.getItem("petExp")) || 0;
+let petX = Math.random()*80 + 10;
+let petY = Math.random()*60 + 20;
+let isDancing = false;
+let longPressTimer = null;
+
+// 小狗可爱语录
+const dogWords = [
+    "姐姐好漂亮呀～",
+    "小韩哥哥最帅了！",
+    "汪汪汪！想你们啦",
+    "要抱抱要亲亲～",
+    "今天也要开心哦",
+    "姐姐不要生气嘛",
+    "小狗狗永远爱你们",
+    "快摸摸我呀～",
+    "肚子饿饿，要吃肉肉",
+    "陪我玩好不好？"
+];
 
 // 随机情话库
 const loveWords = [
@@ -238,13 +275,15 @@ function getPeriodTips(){
     return {nextDays,status,color};
 }
 
-// 初始化电子小狗
-function initPet(){
-    const petContainer = document.createElement("div");
-    petContainer.className = "pet-container";
-    petContainer.innerHTML = `
-    <div class="pet" id="pet" style="left:${petPosition}%">
-        <div class="pet-status" id="pet-status">🐶 开心值：${petHappiness}%</div>
+// 初始化超级小狗
+function initSuperPet(){
+    const pet = document.createElement("div");
+    pet.className = "pet";
+    pet.id = "pet";
+    pet.style.left = petX + "%";
+    pet.style.top = petY + "%";
+    pet.innerHTML = `
+        <div class="pet-status" id="pet-status">🐶 Lv.${petLevel} 开心值：${Math.round(petHappiness)}%</div>
         <div class="dog-body">
             <div class="dog-head">
                 <div class="dog-ear left"></div>
@@ -254,42 +293,113 @@ function initPet(){
                 <div class="dog-nose"></div>
             </div>
             <div class="dog-tail"></div>
-        </div>
-    </div>`;
-    document.body.appendChild(petContainer);
+        </div>`;
+    document.body.appendChild(pet);
 
-    // 小狗自动走路
+    // 小狗随机满屏幕移动
     setInterval(()=>{
-        petPosition += petDirection * 0.5;
-        if(petPosition >= 90 || petPosition <= 10){
-            petDirection *= -1;
+        if(!isDancing){
+            petX = Math.random()*80 + 10;
+            petY = Math.random()*60 + 20;
+            document.getElementById("pet").style.left = petX + "%";
+            document.getElementById("pet").style.top = petY + "%";
         }
-        document.getElementById("pet").style.left = petPosition + "%";
         
-        // 开心值随时间下降
-        petHappiness = Math.max(0, petHappiness - 0.1);
-        localStorage.setItem("petHappiness", petHappiness);
+        // 开心值随时间缓慢下降
+        petHappiness = Math.max(0, petHappiness - 0.05);
         updatePetStatus();
-    }, 100);
+        
+        // 开心值100%时随机跳舞
+        if(petHappiness >= 100 && Math.random() < 0.1 && !isDancing){
+            startDance();
+        }
+    }, 3000);
+
+    // 随机说可爱的话
+    setInterval(()=>{
+        if(Math.random() < 0.3){
+            showDogBubble(dogWords[Math.floor(Math.random()*dogWords.length)]);
+        }
+    }, 10000);
 
     // 点击小狗互动
-    document.getElementById("pet").onclick = function(){
-        petHappiness = Math.min(100, petHappiness + 5);
-        localStorage.setItem("petHappiness", petHappiness);
+    pet.onclick = function(){
+        clearTimeout(longPressTimer);
+        petHappiness = Math.min(100, petHappiness + 3);
+        petExp += 1;
+        checkLevelUp();
         this.classList.add("happy");
-        setTimeout(()=>this.classList.remove("happy"), 1000);
+        setTimeout(()=>this.classList.remove("happy"), 500);
         updatePetStatus();
     }
+
+    // 长按小狗抚摸（加更多开心值）
+    pet.onmousedown = pet.ontouchstart = function(){
+        longPressTimer = setTimeout(()=>{
+            petHappiness = Math.min(100, petHappiness + 10);
+            petExp += 5;
+            checkLevelUp();
+            showDogBubble("好舒服呀～谢谢姐姐/哥哥摸摸🥰");
+            updatePetStatus();
+        }, 500);
+    }
+
+    pet.onmouseup = pet.ontouchend = function(){
+        clearTimeout(longPressTimer);
+    }
+}
+
+// 小狗跳舞
+function startDance(){
+    isDancing = true;
+    const pet = document.getElementById("pet");
+    pet.classList.add("dancing");
+    showDogBubble("🎉 我超开心！给你们跳个舞～");
+    
+    setTimeout(()=>{
+        pet.classList.remove("dancing");
+        isDancing = false;
+        petHappiness = 80; // 跳舞消耗开心值
+        updatePetStatus();
+    }, 5000);
+}
+
+// 显示小狗气泡
+function showDogBubble(text){
+    const oldBubble = document.querySelector(".pet-bubble");
+    if(oldBubble) oldBubble.remove();
+    
+    const bubble = document.createElement("div");
+    bubble.className = "pet-bubble";
+    bubble.innerText = text;
+    document.getElementById("pet").appendChild(bubble);
+    
+    setTimeout(()=>bubble.remove(), 3000);
+}
+
+// 检查升级
+function checkLevelUp(){
+    const expNeeded = petLevel * 100;
+    if(petExp >= expNeeded){
+        petLevel++;
+        petExp = 0;
+        localStorage.setItem("petLevel", petLevel);
+        localStorage.setItem("petExp", petExp);
+        showDogBubble(`🎊 升级啦！现在是 Lv.${petLevel} 小狗狗！`);
+    }
+    localStorage.setItem("petExp", petExp);
 }
 
 // 更新小狗状态
 function updatePetStatus(){
+    localStorage.setItem("petHappiness", petHappiness);
     let status;
-    if(petHappiness >= 80) status = "🐶 超开心！";
-    else if(petHappiness >= 50) status = "🐶 很开心～";
-    else if(petHappiness >= 20) status = "🐶 有点饿了...";
-    else status = "🐶 呜呜，想姐姐了🥺";
-    document.getElementById("pet-status").innerText = `${status} 开心值：${Math.round(petHappiness)}%`;
+    if(petHappiness >= 90) status = "🐶 超级开心！";
+    else if(petHappiness >= 70) status = "🐶 很开心～";
+    else if(petHappiness >= 40) status = "🐶 还不错哦";
+    else if(petHappiness >= 20) status = "🐶 有点无聊...";
+    else status = "🐶 呜呜，想你们了🥺";
+    document.getElementById("pet-status").innerText = `${status} Lv.${petLevel} 开心值：${Math.round(petHappiness)}%`;
 }
 
 function check(){
@@ -347,6 +457,7 @@ function check(){
                     <button class="btn" onclick="refreshWord()">💌 换一句情话</button>
                     <button class="btn" onclick="sayLove()" ${!canLove?"disabled":""}>💕 今日说我爱你</button>
                     <button class="btn" onclick="feedPet()">🍖 喂小狗吃东西</button>
+                    <button class="btn" onclick="playWithPet()">🎾 陪小狗玩</button>
                 </div>
 
                 <div class="wish-box">
@@ -420,13 +531,19 @@ function check(){
             }
             // 喂小狗
             window.feedPet = function(){
-                petHappiness = Math.min(100, petHappiness + 20);
-                localStorage.setItem("petHappiness", petHappiness);
-                const pet = document.getElementById("pet");
-                pet.classList.add("happy");
-                setTimeout(()=>pet.classList.remove("happy"), 2000);
+                petHappiness = Math.min(100, petHappiness + 25);
+                petExp += 10;
+                checkLevelUp();
+                showDogBubble("🍖 好好吃！谢谢姐姐/哥哥～");
                 updatePetStatus();
-                alert("🍖 小狗吃饱啦！摇尾巴谢谢姐姐～");
+            }
+            // 陪小狗玩
+            window.playWithPet = function(){
+                petHappiness = Math.min(100, petHappiness + 15);
+                petExp += 8;
+                checkLevelUp();
+                showDogBubble("🎾 太好玩啦！再玩一次～");
+                updatePetStatus();
             }
 
             // 更新生理期
@@ -437,8 +554,8 @@ function check(){
                 location.reload();
             }
 
-            // 初始化电子小狗
-            initPet();
+            // 初始化超级小狗
+            initSuperPet();
         },3000);
     }else{
         alert("密码不对～只有黄帝大人才能进来哦");
