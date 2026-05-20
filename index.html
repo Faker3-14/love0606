@@ -56,31 +56,15 @@
         .memo{
             font-size:18px;margin:12px 0;color:#555;line-height:1.8
         }
-        .date-box,.period-box{
+        .date-box,.period-box,.fun-box{
             margin-top:30px;padding:24px;
             background:rgba(255,255,255,0.75);border-radius:18px;
         }
         .date-title{
             font-size:20px;color:#c8102e;margin-bottom:12px;font-weight:bold;
         }
-
-        .photo-wall{margin-top:40px;}
-        .photo-title{font-size:22px;color:#c8102e;margin-bottom:20px;}
-        .photos{
-            display:grid;grid-template-columns:1fr 1fr;gap:12px;
-            max-width:600px;margin:0 auto 30px;
-        }
-        .photos img{width:100%;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.1);}
-
-        .upload-box{margin-top:20px;}
-        #file-input{display:none;}
-        .upload-btn{
-            background:#f43f5e;
-            padding:14px 28px;border-radius:20px;color:white;
-            font-size:17px;cursor:pointer;display:inline-block;
-        }
-        .period-input{
-            margin-top:10px;padding:10px;border-radius:10px;border:1px solid #ddd;width:70%;
+        .btn{
+            margin:8px;padding:10px 18px;background:#f43f5e;color:white;border:none;border-radius:12px;font-size:15px;
         }
     </style>
 </head>
@@ -103,13 +87,31 @@ const birthdayMe = new Date(new Date().getFullYear()+"-03-29");
 
 let lastPeriod = localStorage.getItem("lastPeriod") || "2025-05-06";
 const cycle = 28;
+let missCount = Number(localStorage.getItem("missCount")) || 0;
+
+// 随机情话库
+const loveWords = [
+    "姐姐是藏在我心底的温柔与偏爱",
+    "朝朝暮暮，岁岁年年，只想黏着姐姐",
+    "我的所有温柔，只给黄雨辰一个人",
+    "遇见姐姐，是我这辈子最大的幸运",
+    "往后余生，目光所至，皆是姐姐",
+    "小韩永远偏爱、守护、依赖漂亮姐姐"
+];
+
+// 今日情侣运势
+const luckList = [
+    "💖 甜蜜模式：今天适合黏着姐姐撒娇",
+    "🥰 宠溺模式：今天要无条件宠姐姐",
+    "💞 心动模式：今天会格外想念对方",
+    "✨ 安稳模式：平平淡淡，一直相爱"
+];
 
 // 在一起时间
 function getTogetherTime(){
     const now = new Date();
     let start = new Date(togetherStart);
     let years = 0, months = 0, days = 0;
-
     while (new Date(start.getFullYear()+1, start.getMonth(), start.getDate()) <= now) {
         years++; start.setFullYear(start.getFullYear()+1);
     }
@@ -127,7 +129,6 @@ function getPeriodTips(){
     const now = new Date();
     const diff = Math.floor((now - last)/(1000*60*60*24));
     const nextDays = cycle - (diff % cycle);
-
     let status,color;
     if(nextDays <= 5){
         status="🩸 生理期快来啦，姐姐注意保暖～";color="#e11c47";
@@ -152,12 +153,15 @@ function check(){
             let birthMeLeft = Math.ceil((birthdayMe - now) / (1000*60*60*24));
             if(birthMeLeft < 0) birthMeLeft += 365;
             const periodInfo = getPeriodTips();
+            const randomWord = loveWords[Math.floor(Math.random()*loveWords.length)];
+            const todayLuck = luckList[Math.floor(Math.random()*luckList.length)];
 
             document.getElementById('page').innerHTML = `
             <div class="content">
                 <h1 class="couple-name">小韩 ❤️ 漂亮姐姐 黄雨辰</h1>
                 <p class="love-day">我们已经相爱 ${t.years}年${t.months}月${t.days}天</p>
                 <p class="memo">总计 ${t.totalDays} 天</p>
+                <p class="memo">${randomWord}</p>
                 <p class="memo">全世界最好的姐姐<br>我永远偏爱你、依赖你、守护你</p>
                 <p class="memo">你是我的温柔，是我的偏爱，也是我的唯一</p>
                 <p class="memo">往后我想一直叫你姐姐</p>
@@ -177,24 +181,24 @@ function check(){
                     <p class="memo" style="font-size:14px;margin-top:8px">姐姐可自己更新生理期日期</p>
                 </div>
 
-                <div class="photo-wall">
-                    <p class="photo-title">📸 我们的合照</p>
-                    <div class="photos" id="photo-container"></div>
-                    <div class="upload-box">
-                        <input type="file" id="file-input" accept="image/*" multiple>
-                        <label for="file-input" class="upload-btn">✨ 点这里上传合照</label>
-                    </div>
+                <div class="fun-box">
+                    <p class="date-title">✨ 情侣小乐园</p>
+                    <p class="memo">今日运势：${todayLuck}</p>
+                    <p class="memo">我已经想姐姐 <span id="miss-num">${missCount}</span> 次啦</p>
+                    <button class="btn" onclick="addMiss()">💓 又想姐姐了 +1</button>
+                    <button class="btn" onclick="refreshWord()">💌 换一句情话</button>
                 </div>
             </div>`;
 
-            // 核心：本地直接预览，**立刻显示**，不上传任何云端
-            const container = document.getElementById("photo-container");
-            document.getElementById("file-input").onchange = function(e){
-                const files = e.target.files;
-                for(let i=0; i<files.length; i++){
-                    const url = URL.createObjectURL(files[i]);
-                    container.innerHTML += `<img src="${url}" alt="合照">`;
-                }
+            // 想念次数+1
+            window.addMiss = function(){
+                missCount++;
+                localStorage.setItem("missCount",missCount);
+                document.getElementById("miss-num").innerText = missCount;
+            }
+            // 刷新情话
+            window.refreshWord = function(){
+                location.reload();
             }
 
             // 更新生理期
@@ -206,7 +210,7 @@ function check(){
             }
         },3000);
     }else{
-        alert("密码不对～只有我的黄帝大人才能进来哦");
+        alert("密码不对～只有黄帝大人才能进来哦");
     }
 }
 </script>
