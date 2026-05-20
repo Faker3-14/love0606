@@ -97,7 +97,8 @@
 
 <script>
 const correct = "0329";
-const together = new Date("2025-05-21");
+// ✅ 正式在一起日期：2026年5月21日
+const togetherStart = new Date("2026-05-21");
 const birthdaySister = new Date(new Date().getFullYear()+"-06-06");
 const birthdayMe = new Date(new Date().getFullYear()+"-03-29");
 
@@ -115,6 +116,28 @@ async function uploadImage(file){
     });
     const data = await res.json();
     return data.data.url;
+}
+
+// 精确计算：在一起 年/月/日 + 总天数
+function getTogetherTime(){
+    const now = new Date();
+    let start = new Date(togetherStart);
+    let years = 0, months = 0, days = 0;
+
+    // 年
+    while (new Date(start.getFullYear()+1, start.getMonth(), start.getDate()) <= now) {
+        years++;
+        start.setFullYear(start.getFullYear()+1);
+    }
+    // 月
+    while (new Date(start.getFullYear(), start.getMonth()+1, start.getDate()) <= now) {
+        months++;
+        start.setMonth(start.getMonth()+1);
+    }
+    // 日
+    days = Math.floor((now - start) / (1000*60*60*24));
+    const totalDays = Math.max(0, Math.floor((now - togetherStart) / (1000*60*60*24)));
+    return {years,months,days,totalDays};
 }
 
 function getPeriodTips(){
@@ -141,7 +164,7 @@ function check(){
         
         setTimeout(()=>{
             const now = new Date();
-            const days = Math.max(0, Math.floor((now - together) / (1000*60*60*24)));
+            const t = getTogetherTime();
             let birthSisterLeft = Math.ceil((birthdaySister - now) / (1000*60*60*24));
             if(birthSisterLeft < 0) birthSisterLeft += 365;
             let birthMeLeft = Math.ceil((birthdayMe - now) / (1000*60*60*24));
@@ -152,14 +175,15 @@ function check(){
             document.getElementById('page').innerHTML = `
             <div class="content">
                 <h1 class="couple-name">韩天宇 ❤️ 我的姐姐 黄雨辰</h1>
-                <p class="love-day">我们已经相爱 ${days} 天啦</p>
+                <p class="love-day">我们已经相爱 ${t.years}年${t.months}月${t.days}天</p>
+                <p class="memo">总计 ${t.totalDays} 天</p>
                 <p class="memo">全世界最好的姐姐<br>天宇永远偏爱你、依赖你、守护你</p>
                 <p class="memo">姐姐是我的温柔，是我的偏爱，是我的唯一</p>
                 <p class="memo">往后余生，只想一直叫你姐姐</p>
 
                 <div class="date-box">
                     <p class="date-title">💌 我们的专属纪念日</p>
-                    <p class="memo">和姐姐的开始：2025.05.21</p>
+                    <p class="memo">和姐姐正式开始：2026.05.21</p>
                     <p class="memo">姐姐生日(06.06)：还有 ${birthSisterLeft} 天</p>
                     <p class="memo">天宇生日(03.29)：还有 ${birthMeLeft} 天</p>
                 </div>
