@@ -194,7 +194,6 @@ const correct = "0329";
 const togetherStart = new Date("2026-05-21");
 const birthdaySister = new Date(new Date().getFullYear()+"-06-06");
 const birthdayMe = new Date(new Date().getFullYear()+"-03-29");
-const nextMeet = new Date("2026-05-21");
 
 let lastPeriod = localStorage.getItem("lastPeriod") || "2025-05-06";
 const cycle = 28;
@@ -369,7 +368,6 @@ function check(){
             if(birthSisterLeft < 0) birthSisterLeft += 365;
             let birthMeLeft = Math.ceil((birthdayMe - now) / (1000*60*60*24));
             if(birthMeLeft < 0) birthMeLeft += 365;
-            const meetLeft = Math.max(0, Math.ceil((nextMeet - now) / (1000*60*60*24)));
             const periodInfo = getPeriodTips();
             const randomWord = loveWords[Math.floor(Math.random()*loveWords.length)];
             const todayLuck = luckList[Math.floor(Math.random()*luckList.length)];
@@ -381,13 +379,12 @@ function check(){
             <div class="content">
                 <h1 class="couple-name">小韩 ❤️ 漂亮姐姐 黄雨辰</h1>
                 <p class="love-day">我们已经相爱 ${t.years}年${t.months}月${t.days}天</p>
-                <p class="memo">总计 ${t.totalDays} 天</p>
+                <p class="memo">我们在一起已经 ${t.totalDays} 天啦</p>
                 <div class="memo typewriter" id="loveLetter"></div>
 
                 <div class="date-box">
                     <p class="date-title">💌 我们的专属纪念日</p>
                     <p class="memo">和姐姐正式开始：2026.05.21</p>
-                    <p class="memo">距离下次见面：还有 ${meetLeft} 天</p>
                     <p class="memo">姐姐生日(06.06)：还有 ${birthSisterLeft} 天</p>
                     <p class="memo">我的生日(03.29)：还有 ${birthMeLeft} 天</p>
                 </div>
@@ -578,7 +575,7 @@ function check(){
             initSuperPet();
         },3000);
     }else{
-        alert("密码不对～只有黄帝大人才能进来哦");
+        alert("密码不对～只有我的黄帝大人才能进来哦");
     }
 }
 </script>
