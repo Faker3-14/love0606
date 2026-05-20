@@ -6,7 +6,7 @@
     <title>❤️ is黄黄 & Han仔 专属秘密 ❤️</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
-        body{margin:0;overflow-x:hidden}
+        body{margin:0;overflow-x:hidden;padding-bottom:120px}
         .login{
             min-height:100vh;
             display:flex;align-items:center;justify-content:center;
@@ -83,20 +83,57 @@
         .wheel-text{
             transform:rotate(45deg);font-size:12px;font-weight:bold;
         }
-        .falling-heart{
-            position:fixed;top:-10%;color:#f43f5e;animation:fall 10s linear infinite;
-            z-index:0;pointer-events:none;
-        }
-        @keyframes fall{
-            to{transform:translateY(110vh) rotate(360deg)}
-        }
-        .click-heart{
-            position:absolute;color:#f43f5e;animation:pop 1s ease-out forwards;
+
+        /* ========== 电子小狗宠物 ========== */
+        .pet-container{
+            position:fixed;bottom:20px;left:0;right:0;z-index:999;
             pointer-events:none;
         }
-        @keyframes pop{
-            0%{transform:scale(0);opacity:1}
-            100%{transform:scale(2);opacity:0}
+        .pet{
+            position:absolute;bottom:0;pointer-events:auto;cursor:pointer;
+            transition:transform 0.3s;
+        }
+        .dog-body{
+            width:60px;height:40px;background:#f9a826;border-radius:30px;
+            position:relative;
+        }
+        .dog-head{
+            width:40px;height:35px;background:#f9a826;border-radius:50%;
+            position:absolute;top:-20px;left:-15px;
+        }
+        .dog-ear{
+            width:12px;height:20px;background:#f59e0b;border-radius:50%;
+            position:absolute;top:-5px;
+        }
+        .dog-ear.left{left:-5px;transform:rotate(-20deg)}
+        .dog-ear.right{right:-5px;transform:rotate(20deg)}
+        .dog-eye{
+            width:6px;height:6px;background:#000;border-radius:50%;
+            position:absolute;top:10px;
+        }
+        .dog-eye.left{left:8px}
+        .dog-eye.right{right:8px}
+        .dog-nose{
+            width:8px;height:6px;background:#000;border-radius:50%;
+            position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+        }
+        .dog-tail{
+            width:20px;height:8px;background:#f59e0b;border-radius:10px;
+            position:absolute;right:-15px;top:15px;
+            transform-origin:left center;
+            animation:wag 1s infinite alternate;
+        }
+        .pet-status{
+            position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+            background:#fff;padding:4px 8px;border-radius:8px;font-size:12px;
+            white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,0.1);
+        }
+        @keyframes wag{
+            0%{transform:rotate(-20deg)}
+            100%{transform:rotate(20deg)}
+        }
+        .pet.happy .dog-tail{
+            animation-duration:0.3s;
         }
     </style>
 </head>
@@ -131,6 +168,11 @@ let wishes = JSON.parse(localStorage.getItem("wishes")) || [
     {text:"一起拍一组情侣照",done:false},
     {text:"一起去游乐园",done:false}
 ];
+
+// 电子小狗状态
+let petHappiness = Number(localStorage.getItem("petHappiness")) || 100;
+let petPosition = 50;
+let petDirection = 1;
 
 // 随机情话库
 const loveWords = [
@@ -196,34 +238,58 @@ function getPeriodTips(){
     return {nextDays,status,color};
 }
 
-// 背景爱心飘落
-function initFallingHearts(){
+// 初始化电子小狗
+function initPet(){
+    const petContainer = document.createElement("div");
+    petContainer.className = "pet-container";
+    petContainer.innerHTML = `
+    <div class="pet" id="pet" style="left:${petPosition}%">
+        <div class="pet-status" id="pet-status">🐶 开心值：${petHappiness}%</div>
+        <div class="dog-body">
+            <div class="dog-head">
+                <div class="dog-ear left"></div>
+                <div class="dog-ear right"></div>
+                <div class="dog-eye left"></div>
+                <div class="dog-eye right"></div>
+                <div class="dog-nose"></div>
+            </div>
+            <div class="dog-tail"></div>
+        </div>
+    </div>`;
+    document.body.appendChild(petContainer);
+
+    // 小狗自动走路
     setInterval(()=>{
-        const heart = document.createElement("div");
-        heart.className = "falling-heart";
-        heart.innerText = "❤️";
-        heart.style.left = Math.random()*100 + "vw";
-        heart.style.animationDuration = (Math.random()*5+5) + "s";
-        heart.style.fontSize = (Math.random()*10+10) + "px";
-        document.body.appendChild(heart);
-        setTimeout(()=>heart.remove(),15000);
-    },500);
+        petPosition += petDirection * 0.5;
+        if(petPosition >= 90 || petPosition <= 10){
+            petDirection *= -1;
+        }
+        document.getElementById("pet").style.left = petPosition + "%";
+        
+        // 开心值随时间下降
+        petHappiness = Math.max(0, petHappiness - 0.1);
+        localStorage.setItem("petHappiness", petHappiness);
+        updatePetStatus();
+    }, 100);
+
+    // 点击小狗互动
+    document.getElementById("pet").onclick = function(){
+        petHappiness = Math.min(100, petHappiness + 5);
+        localStorage.setItem("petHappiness", petHappiness);
+        this.classList.add("happy");
+        setTimeout(()=>this.classList.remove("happy"), 1000);
+        updatePetStatus();
+    }
 }
 
-// 点击屏幕冒爱心
-function initClickHearts(){
-    document.addEventListener("click",(e)=>{
-        for(let i=0;i<3;i++){
-            const heart = document.createElement("div");
-            heart.className = "click-heart";
-            heart.innerText = "❤️";
-            heart.style.left = e.clientX + "px";
-            heart.style.top = e.clientY + "px";
-            heart.style.fontSize = (Math.random()*10+15) + "px";
-            document.body.appendChild(heart);
-            setTimeout(()=>heart.remove(),1000);
-        }
-    });
+// 更新小狗状态
+function updatePetStatus(){
+    let status;
+    if(petHappiness >= 80) status = "🐶 超开心！";
+    else if(petHappiness >= 50) status = "🐶 很开心～";
+    else if(petHappiness >= 20) status = "🐶 有点饿了...";
+    else status = "🐶 呜呜，想姐姐了🥺";
+    document.getElementById("pet-status").innerText = `${status} 开心值：${Math.round(petHappiness)}%`;
 }
 
 function check(){
@@ -280,6 +346,7 @@ function check(){
                     <button class="btn" onclick="addMiss()">💓 又想姐姐了 +1</button>
                     <button class="btn" onclick="refreshWord()">💌 换一句情话</button>
                     <button class="btn" onclick="sayLove()" ${!canLove?"disabled":""}>💕 今日说我爱你</button>
+                    <button class="btn" onclick="feedPet()">🍖 喂小狗吃东西</button>
                 </div>
 
                 <div class="wish-box">
@@ -351,6 +418,16 @@ function check(){
                     document.getElementById("game-result").innerText = result;
                 },4000);
             }
+            // 喂小狗
+            window.feedPet = function(){
+                petHappiness = Math.min(100, petHappiness + 20);
+                localStorage.setItem("petHappiness", petHappiness);
+                const pet = document.getElementById("pet");
+                pet.classList.add("happy");
+                setTimeout(()=>pet.classList.remove("happy"), 2000);
+                updatePetStatus();
+                alert("🍖 小狗吃饱啦！摇尾巴谢谢姐姐～");
+            }
 
             // 更新生理期
             document.getElementById("period-date").onchange = (e)=>{
@@ -360,9 +437,8 @@ function check(){
                 location.reload();
             }
 
-            // 初始化特效
-            initFallingHearts();
-            initClickHearts();
+            // 初始化电子小狗
+            initPet();
         },3000);
     }else{
         alert("密码不对～只有黄帝大人才能进来哦");
