@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>❤️love0606专属入口❤️</title>
+    <title>❤️ love0606 专属秘密 ❤️</title>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
         .login{
@@ -25,42 +25,70 @@
             background:#f472b6;color:#fff;border:none;
             padding:12px 24px;border-radius:16px;font-size:16px;cursor:pointer
         }
+
+        .heart-page{
+            min-height:100vh;
+            background:#fce7f3;
+            display:flex;align-items:center;justify-content:center;
+        }
+        .heart{
+            font-size:120px;color:#f43f5e;
+            animation:beat 0.6s infinite;
+        }
+        @keyframes beat{
+            0%,100%{transform:scale(1)}
+            50%{transform:scale(1.2)}
+        }
+
         .content{
             min-height:100vh;
             background:linear-gradient(#fbcfe8,#fff);
-            display:flex;flex-direction:column;
-            align-items:center;justify-content:center;
-            text-align:center;padding:30px;
+            padding:30px;text-align:center;
         }
-        .content h1{font-size:48px;margin-bottom:24px}
-        .content p{font-size:20px;margin:12px 0}
+        .title{font-size:42px;margin:20px 0;}
+        .love-day{font-size:22px;color:#e11c47;margin:10px 0;}
+        .words{font-size:18px;margin:10px 0;color:#555}
     </style>
 </head>
 <body>
-    <div id="page" class="login">
-        <div class="box">
-            <h1>🔒 专属入口</h1>
-            <p>只有输入密码才能进入</p>
-            <input type="password" id="pwd" placeholder="输入密码">
-            <button onclick="check()">进入</button>
-        </div>
-    </div>
 
-    <script>
-        const correct = "0329";
-        function check(){
-            let val = document.getElementById('pwd').value;
-            if(val === correct){
-                document.getElementById('page').innerHTML = `
-                <div class="content">
-                    <h1>❤️ love0606 专属秘密 ❤️</h1>
-                    <p>欢迎来到只属于我们两个人的小世界。</p>
-                    <p>以后可以加：照片墙、恋爱时间、地图足迹、视频、回忆盒子。</p>
-                </div>`;
-            }else{
-                alert("密码错误");
-            }
-        }
-    </script>
+<div id="page" class="login">
+    <div class="box">
+        <h1>🔒 专属入口</h1>
+        <p>只有输入密码才能进入</p>
+        <input type="password" id="pwd" placeholder="输入密码">
+        <button onclick="check()">进入</button>
+    </div>
+</div>
+
+<script>
+const correct = "0329";
+
+// 👇 改成你们在一起的日期！年-月-日
+const together = new Date("2024-06-06");
+
+function check(){
+    let val = document.getElementById('pwd').value;
+    if(val === correct){
+        document.getElementById('page').innerHTML = `<div class="heart-page"><div class="heart">❤️</div></div>`;
+        
+        setTimeout(()=>{
+            const now = new Date();
+            const days = Math.floor((now - together) / (1000*60*60*24));
+            
+            document.getElementById('page').innerHTML = `
+            <div class="content">
+                <h1 class="title">❤️ love0606 专属秘密 ❤️</h1>
+                <p class="love-day">我们已经相爱 ${days} 天啦</p>
+                <p class="words">遇见你是我最幸运的事</p>
+                <p class="words">我的温柔与偏爱，全部都给你</p>
+                <p class="words">岁岁年年，朝朝暮暮，永远爱你</p>
+            </div>`;
+        },3000);
+    }else{
+        alert("密码错误");
+    }
+}
+</script>
 </body>
 </html>
