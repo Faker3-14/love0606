@@ -84,97 +84,156 @@
             transform:rotate(45deg);font-size:12px;font-weight:bold;
         }
 
-        /* ========== 超级电子小狗 ========== */
+        /* ========== 3D QQ风格电子小狗 ========== */
+        .pet-container{
+            position:fixed;z-index:999;
+            perspective: 1000px;
+            pointer-events:none;
+        }
         .pet{
-            position:fixed;z-index:999;cursor:pointer;
-            transition:all 0.5s ease;
-            user-select:none;
-        }
-        .dog-body{
-            width:60px;height:40px;background:#f9a826;border-radius:30px;
             position:relative;
+            transform-style: preserve-3d;
+            cursor:pointer;
+            pointer-events:auto;
+            transition: all 0.5s ease;
         }
+        /* 3D身体 */
+        .dog-body{
+            width:70px;height:50px;
+            background: linear-gradient(135deg, #f9a826 0%, #f59e0b 100%);
+            border-radius: 35px 35px 30px 30px;
+            position:relative;
+            transform: rotateX(10deg);
+            box-shadow: 
+                0 10px 15px rgba(0,0,0,0.2),
+                inset 0 -5px 10px rgba(0,0,0,0.1);
+        }
+        /* 3D头部 */
         .dog-head{
-            width:40px;height:35px;background:#f9a826;border-radius:50%;
-            position:absolute;top:-20px;left:-15px;
+            width:50px;height:45px;
+            background: linear-gradient(135deg, #f9a826 0%, #f59e0b 100%);
+            border-radius: 50%;
+            position:absolute;
+            top:-30px;left:-10px;
+            transform: rotateX(15deg);
+            box-shadow: 
+                0 5px 10px rgba(0,0,0,0.15),
+                inset 0 -3px 8px rgba(0,0,0,0.08);
         }
+        /* 3D耳朵 */
         .dog-ear{
-            width:12px;height:20px;background:#f59e0b;border-radius:50%;
-            position:absolute;top:-5px;
+            width:15px;height:25px;
+            background: #f59e0b;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position:absolute;
+            top:-8px;
+            transform: rotateX(20deg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .dog-ear.left{left:-5px;transform:rotate(-20deg)}
-        .dog-ear.right{right:-5px;transform:rotate(20deg)}
+        .dog-ear.left{
+            left:-3px;
+            transform: rotate(-25deg) rotateX(20deg);
+        }
+        .dog-ear.right{
+            right:-3px;
+            transform: rotate(25deg) rotateX(20deg);
+        }
+        /* 3D眼睛 */
         .dog-eye{
-            width:6px;height:6px;background:#000;border-radius:50%;
-            position:absolute;top:10px;
+            width:8px;height:8px;
+            background: #000;
+            border-radius: 50%;
+            position:absolute;
+            top:12px;
+            box-shadow: 0 0 2px rgba(255,255,255,0.8);
         }
-        .dog-eye.left{left:8px}
-        .dog-eye.right{right:8px}
+        .dog-eye.left{left:10px}
+        .dog-eye.right{right:10px}
+        /* 3D鼻子 */
         .dog-nose{
-            width:8px;height:6px;background:#000;border-radius:50%;
-            position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+            width:10px;height:8px;
+            background: linear-gradient(135deg, #333 0%, #000 100%);
+            border-radius: 50%;
+            position:absolute;
+            bottom:10px;left:50%;
+            transform: translateX(-50%) rotateX(10deg);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
+        /* 3D尾巴 */
         .dog-tail{
-            width:20px;height:8px;background:#f59e0b;border-radius:10px;
-            position:absolute;right:-15px;top:15px;
-            transform-origin:left center;
-            animation:wag 1s infinite alternate;
+            width:25px;height:10px;
+            background: #f59e0b;
+            border-radius: 10px;
+            position:absolute;
+            right:-20px;top:18px;
+            transform-origin: left center;
+            transform: rotateX(10deg);
+            animation: wag 1s infinite alternate;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .pet-status{
-            position:absolute;top:-40px;left:50%;transform:translateX(-50%);
-            background:#fff;padding:6px 10px;border-radius:12px;font-size:12px;
-            white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.15);
+            position:absolute;top:-50px;left:50%;transform:translateX(-50%);
+            background:#fff;padding:6px 12px;border-radius:15px;font-size:12px;
+            white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.15);
             animation:bubble 0.3s ease;
+            transform: translateX(-50%) translateZ(20px);
         }
         .pet-bubble{
-            position:absolute;top:-70px;left:50%;transform:translateX(-50%);
-            background:#fff;padding:8px 12px;border-radius:16px;font-size:13px;
-            white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.15);
+            position:absolute;top:-80px;left:50%;transform:translateX(-50%);
+            background:#fff;padding:8px 14px;border-radius:18px;font-size:13px;
+            white-space:nowrap;box-shadow:0 3px 10px rgba(0,0,0,0.15);
             animation:bubble 0.5s ease;
-            max-width:200px;
+            max-width:220px;
+            transform: translateX(-50%) translateZ(30px);
         }
         @keyframes wag{
-            0%{transform:rotate(-20deg)}
-            100%{transform:rotate(20deg)}
+            0%{transform: rotate(-20deg) rotateX(10deg)}
+            100%{transform: rotate(20deg) rotateX(10deg)}
         }
         @keyframes bubble{
-            0%{transform:translateX(-50%) scale(0);opacity:0}
-            100%{transform:translateX(-50%) scale(1);opacity:1}
+            0%{transform:translateX(-50%) scale(0) translateZ(20px);opacity:0}
+            100%{transform:translateX(-50%) scale(1) translateZ(20px);opacity:1}
         }
         @keyframes dance{
-            0%{transform:rotate(0deg) translateY(0)}
-            25%{transform:rotate(-15deg) translateY(-10px)}
-            50%{transform:rotate(0deg) translateY(0)}
-            75%{transform:rotate(15deg) translateY(-10px)}
-            100%{transform:rotate(0deg) translateY(0)}
+            0%{transform: rotate(0deg) translateY(0) rotateX(10deg)}
+            25%{transform: rotate(-15deg) translateY(-15px) rotateX(10deg)}
+            50%{transform: rotate(0deg) translateY(0) rotateX(10deg)}
+            75%{transform: rotate(15deg) translateY(-15px) rotateX(10deg)}
+            100%{transform: rotate(0deg) translateY(0) rotateX(10deg)}
         }
         .pet.dancing{
-            animation:dance 0.5s infinite;
+            animation: dance 0.5s infinite;
         }
         .pet.happy .dog-tail{
-            animation-duration:0.2s;
+            animation-duration: 0.2s;
         }
 
-        /* ========== 爱情时间胶囊 ========== */
-        .capsule-input{
-            width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;
-            margin-bottom:10px;resize:none;height:100px;
+        /* ========== 心情打卡互动样式 ========== */
+        .mood-feedback{
+            margin-top:15px;
+            padding:15px;
+            background:rgba(252,231,243,0.5);
+            border-radius:12px;
+            text-align:left;
         }
-        .capsule-date{
-            width:100%;padding:10px;border-radius:10px;border:1px solid #ddd;
-            margin-bottom:10px;
+        .mood-input{
+            width:100%;padding:10px;border-radius:10px;border:1px solid #f472b6;
+            margin-top:10px;resize:none;height:60px;
         }
-        .capsule-item{
-            background:#fce7f3;padding:15px;border-radius:12px;margin:10px 0;text-align:left;
+        .mood-buttons{
+            display:flex;justify-content:space-around;margin:10px 0;
         }
-        .capsule-title{
-            font-weight:bold;margin-bottom:5px;
+        .mood-btn{
+            font-size:28px;background:none;border:none;cursor:pointer;
+            padding:10px;border-radius:10px;transition:all 0.3s;
         }
-        .capsule-time{
-            font-size:12px;color:#999;margin-bottom:8px;
+        .mood-btn:hover{
+            background:#fce7f3;
+            transform: scale(1.2);
         }
-        .capsule-content{
-            white-space:pre-wrap;line-height:1.6;
+        .mood-btn:disabled{
+            opacity:0.5;
+            cursor:not-allowed;
         }
     </style>
 </head>
@@ -212,15 +271,16 @@ let wishes = JSON.parse(localStorage.getItem("wishes")) || [
 let messages = JSON.parse(localStorage.getItem("messages")) || [];
 let todayMood = localStorage.getItem("todayMood") || "";
 let lastMoodDate = localStorage.getItem("lastMoodDate") || "";
+let moodReason = localStorage.getItem("moodReason") || "";
 // 爱情时间胶囊数据
 let capsules = JSON.parse(localStorage.getItem("loveCapsules")) || [];
 
-// 电子小狗超级系统
+// 3D电子小狗系统
 let petHappiness = Number(localStorage.getItem("petHappiness")) || 50;
 let petLevel = Number(localStorage.getItem("petLevel")) || 1;
 let petExp = Number(localStorage.getItem("petExp")) || 0;
-let petX = Math.random()*80 + 10;
-let petY = Math.random()*60 + 20;
+let petX = Math.random()*70 + 15;
+let petY = Math.random()*50 + 25;
 let isDancing = false;
 let longPressTimer = null;
 
@@ -317,14 +377,13 @@ function getPeriodTips(){
     return {nextDays,status,color};
 }
 
-// 初始化超级小狗
-function initSuperPet(){
-    const pet = document.createElement("div");
-    pet.className = "pet";
-    pet.id = "pet";
-    pet.style.left = petX + "%";
-    pet.style.top = petY + "%";
-    pet.innerHTML = `
+// 初始化3D小狗
+function init3DPet(){
+    const petContainer = document.createElement("div");
+    petContainer.className = "pet-container";
+    petContainer.id = "pet-container";
+    petContainer.innerHTML = `
+    <div class="pet" id="pet" style="left:${petX}%;top:${petY}%">
         <div class="pet-status" id="pet-status">🐶 Lv.${petLevel} 开心值：${Math.round(petHappiness)}%</div>
         <div class="dog-body">
             <div class="dog-head">
@@ -335,14 +394,15 @@ function initSuperPet(){
                 <div class="dog-nose"></div>
             </div>
             <div class="dog-tail"></div>
-        </div>`;
-    document.body.appendChild(pet);
+        </div>
+    </div>`;
+    document.body.appendChild(petContainer);
 
     // 小狗随机满屏幕移动
     setInterval(()=>{
         if(!isDancing){
-            petX = Math.random()*80 + 10;
-            petY = Math.random()*60 + 20;
+            petX = Math.random()*70 + 15;
+            petY = Math.random()*50 + 25;
             document.getElementById("pet").style.left = petX + "%";
             document.getElementById("pet").style.top = petY + "%";
         }
@@ -355,38 +415,38 @@ function initSuperPet(){
         if(petHappiness >= 100 && Math.random() < 0.1 && !isDancing){
             startDance();
         }
-    }, 3000);
+    }, 3500);
 
     // 随机说可爱的话
     setInterval(()=>{
         if(Math.random() < 0.3){
             showDogBubble(dogWords[Math.floor(Math.random()*dogWords.length)]);
         }
-    }, 10000);
+    }, 12000);
 
     // 点击小狗互动
-    pet.onclick = function(){
+    document.getElementById("pet").onclick = function(){
         clearTimeout(longPressTimer);
         petHappiness = Math.min(100, petHappiness + 3);
         petExp += 1;
         checkLevelUp();
         this.classList.add("happy");
-        setTimeout(()=>this.classList.remove("happy"), 500);
+        setTimeout(()=>this.classList.remove("happy"), 600);
         updatePetStatus();
     }
 
     // 长按小狗抚摸（加更多开心值）
-    pet.onmousedown = pet.ontouchstart = function(){
+    document.getElementById("pet").onmousedown = document.getElementById("pet").ontouchstart = function(){
         longPressTimer = setTimeout(()=>{
-            petHappiness = Math.min(100, petHappiness + 10);
-            petExp += 5;
+            petHappiness = Math.min(100, petHappiness + 12);
+            petExp += 6;
             checkLevelUp();
             showDogBubble("好舒服呀～谢谢姐姐/哥哥摸摸🥰");
             updatePetStatus();
         }, 500);
     }
 
-    pet.onmouseup = pet.ontouchend = function(){
+    document.getElementById("pet").onmouseup = document.getElementById("pet").ontouchend = function(){
         clearTimeout(longPressTimer);
     }
 }
@@ -401,9 +461,9 @@ function startDance(){
     setTimeout(()=>{
         pet.classList.remove("dancing");
         isDancing = false;
-        petHappiness = 80; // 跳舞消耗开心值
+        petHappiness = 75; // 跳舞消耗开心值
         updatePetStatus();
-    }, 5000);
+    }, 6000);
 }
 
 // 显示小狗气泡
@@ -416,7 +476,7 @@ function showDogBubble(text){
     bubble.innerText = text;
     document.getElementById("pet").appendChild(bubble);
     
-    setTimeout(()=>bubble.remove(), 3000);
+    setTimeout(()=>bubble.remove(), 3500);
 }
 
 // 检查升级
@@ -583,6 +643,7 @@ function check(){
                         <button class="mood-btn" onclick="setMood('😠')" ${!canMood?"disabled":""}>😠</button>
                         <button class="mood-btn" onclick="setMood('🥰')" ${!canMood?"disabled":""}>🥰</button>
                     </div>
+                    <div id="mood-feedback"></div>
                     <p class="memo" style="font-size:14px">每天只能打卡一次哦</p>
                 </div>
             </div>`;
@@ -626,6 +687,25 @@ function check(){
                     }
                 </div>`;
             });
+
+            // 渲染心情反馈
+            const moodFeedback = document.getElementById("mood-feedback");
+            if(todayMood && !canMood){
+                if(todayMood === '😢' || todayMood === '😠'){
+                    moodFeedback.innerHTML = `
+                    <div class="mood-feedback">
+                        <p style="color:#e11c47;font-weight:bold">姐姐今天为什么不高兴呀，可以告诉我吗</p>
+                        <textarea class="mood-input" id="mood-reason-input" placeholder="写下你的心情原因...">${moodReason}</textarea>
+                        <button class="btn" onclick="saveMoodReason()">保存</button>
+                    </div>`;
+                }else{
+                    moodFeedback.innerHTML = `
+                    <div class="mood-feedback">
+                        <p style="color:#2ed573;font-weight:bold">yeah yeah 今天我们又是开开心心的🥳</p>
+                        ${moodReason ? `<p style="margin-top:10px">开心的原因：${moodReason}</p>` : ''}
+                    </div>`;
+                }
+            }
 
             // 打字机情书
             typeWriter(loveLetter, "loveLetter", 80);
@@ -710,11 +790,20 @@ function check(){
                 if(canMood){
                     todayMood = mood;
                     lastMoodDate = today;
+                    moodReason = "";
                     localStorage.setItem("todayMood", todayMood);
                     localStorage.setItem("lastMoodDate", lastMoodDate);
+                    localStorage.setItem("moodReason", moodReason);
                     alert("✅ 心情打卡成功！");
                     location.reload();
                 }
+            }
+            // 保存心情原因
+            window.saveMoodReason = function(){
+                moodReason = document.getElementById("mood-reason-input").value.trim();
+                localStorage.setItem("moodReason", moodReason);
+                alert("✅ 心情原因已保存！");
+                location.reload();
             }
             // 创建时间胶囊
             window.createCapsule = function(){
@@ -755,8 +844,8 @@ function check(){
                 location.reload();
             }
 
-            // 初始化超级小狗
-            initSuperPet();
+            // 初始化3D小狗
+            init3DPet();
         },3000);
     }else{
         alert("密码不对～只有黄帝大人才能进来哦");
