@@ -72,7 +72,7 @@
 
 <div id="page" class="login">
     <div class="box">
-        <h1>🔒 黄帝姐姐的专属小世界</h1>
+        <h1>🔒 黄帝大人的专属小世界</h1>
         <p>只有姐姐能进入哦</p>
         <input type="password" id="pwd" placeholder="输入密码">
         <button onclick="check()">进入</button>
@@ -162,7 +162,7 @@ function check(){
                 <h1 class="couple-name">小韩 ❤️ 漂亮姐姐 黄雨辰</h1>
                 <p class="love-day">我们已经相爱 ${t.years}年${t.months}月${t.days}天</p>
                 <p class="memo">总计 ${t.totalDays} 天</p>
-                <p class="memo">${randomWord}</p>
+                
                 <p class="memo">全世界最好的姐姐<br>我永远偏爱你、依赖你、守护你</p>
                 <p class="memo">你是我的温柔，是我的偏爱，也是我的唯一</p>
                 <p class="memo">往后我想一直叫你姐姐</p>
@@ -184,6 +184,7 @@ function check(){
 
                 <div class="fun-box">
                     <p class="date-title">✨ 情侣小乐园</p>
+                    <p class="memo">今日情话：${randomWord}</p>
                     <p class="memo">今日运势：${todayLuck}</p>
                     <p class="memo">我已经想姐姐 <span id="miss-num">${missCount}</span> 次啦</p>
                     <button class="btn" onclick="addMiss()">💓 又想姐姐了 +1</button>
