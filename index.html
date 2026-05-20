@@ -104,128 +104,150 @@ const birthdayMe = new Date(new Date().getFullYear()+"-03-29");
 let lastPeriod = localStorage.getItem("lastPeriod") || "2025-05-06";
 const cycle = 28;
 
-// 图床上传
-async function uploadImage(file){
-    const form = new FormData();
-    form.append("image", file);
-    const res = await fetch("https://api.imgbb.com/1/upload?key=645a8f621f7092b8a2f8f2e0f0e8f0e8",{
-        method:"POST",body:form
+// 免费云端存储（所有人可见）
+const API_KEY = "645a8f621f7092b8a2f8f2e0f0e8f0e8";
+const BIN_ID = "6756aeb55c41785776c32869";
+const BIN_KEY = "$2a$10$z9lN1AObGFOx3VqvMpZVbe";
+
+async function uploadImage(file) {
+  const form = new FormData();
+  form.append("image", file);
+  const res = await fetch("https://api.imgbb.com/1/upload?key=" + API_KEY, {
+    method: "POST",
+    body: form
+  });
+  const data = await res.json();
+  return data.data.url;
+}
+
+async function getPhotos() {
+  try {
+    const res = await fetch("https://api.jsonbin.io/v3/b/" + BIN_ID + "/latest", {
+      headers: { "X-Master-Key": BIN_KEY }
     });
     const data = await res.json();
-    return data.data.url;
+    return data.record.photos || [];
+  } catch (e) {
+    return [];
+  }
 }
 
-// 在一起时间
-function getTogetherTime(){
-    const now = new Date();
-    let start = new Date(togetherStart);
-    let years = 0, months = 0, days = 0;
-
-    while (new Date(start.getFullYear()+1, start.getMonth(), start.getDate()) <= now) {
-        years++; start.setFullYear(start.getFullYear()+1);
-    }
-    while (new Date(start.getFullYear(), start.getMonth()+1, start.getDate()) <= now) {
-        months++; start.setMonth(start.getMonth()+1);
-    }
-    days = Math.floor((now - start) / (1000*60*60*24));
-    const totalDays = Math.max(0, Math.floor((now - togetherStart) / (1000*60*60*24)));
-    return {years,months,days,totalDays};
+async function savePhotos(photos) {
+  await fetch("https://api.jsonbin.io/v3/b/" + BIN_ID, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Master-Key": BIN_KEY
+    },
+    body: JSON.stringify({ photos: photos })
+  });
 }
 
-// 生理期
-function getPeriodTips(){
-    const last = new Date(lastPeriod);
-    const now = new Date();
-    const diff = Math.floor((now - last)/(1000*60*60*24));
-    const nextDays = cycle - (diff % cycle);
-
-    let status,color;
-    if(nextDays <= 5){
-        status="🩸 生理期快来啦，姐姐注意保暖～";color="#e11c47";
-    }else if(nextDays <= 14){
-        status="💖 易孕期，要好好照顾姐姐";color="#ff6b81";
-    }else{
-        status="✨ 安全期，安心陪伴姐姐";color="#2ed573";
-    }
-    return {nextDays,status,color};
+function getTogetherTime() {
+  const now = new Date();
+  let start = new Date(togetherStart);
+  let years = 0, months = 0, days = 0;
+  while (new Date(start.getFullYear() + 1, start.getMonth(), start.getDate()) <= now) {
+    years++; start.setFullYear(start.getFullYear() + 1);
+  }
+  while (new Date(start.getFullYear(), start.getMonth() + 1, start.getDate()) <= now) {
+    months++; start.setMonth(start.getMonth() + 1);
+  }
+  days = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+  const totalDays = Math.max(0, Math.floor((now - togetherStart) / (1000 * 60 * 60 * 24)));
+  return { years, months, days, totalDays };
 }
 
-async function check(){
-    let val = document.getElementById('pwd').value;
-    if(val === correct){
-        document.getElementById('page').innerHTML = `<div class="heart-page"><div class="heart">❤️</div></div>`;
-        
-        setTimeout(async ()=>{
-            const now = new Date();
-            const t = getTogetherTime();
-            let birthSisterLeft = Math.ceil((birthdaySister - now) / (1000*60*60*24));
-            if(birthSisterLeft < 0) birthSisterLeft += 365;
-            let birthMeLeft = Math.ceil((birthdayMe - now) / (1000*60*60*24));
-            if(birthMeLeft < 0) birthMeLeft += 365;
-            const periodInfo = getPeriodTips();
+function getPeriodTips() {
+  const last = new Date(lastPeriod);
+  const now = new Date();
+  const diff = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+  const nextDays = cycle - (diff % cycle);
+  let status, color;
+  if (nextDays <= 5) {
+    status = "🩸 生理期快来啦，姐姐注意保暖～"; color = "#e11c47";
+  } else if (nextDays <= 14) {
+    status = "💖 易孕期，要好好照顾姐姐"; color = "#ff6b81";
+  } else {
+    status = "✨ 安全期，安心陪伴姐姐"; color = "#2ed573";
+  }
+  return { nextDays, status, color };
+}
 
-            document.getElementById('page').innerHTML = `
-            <div class="content">
-                <h1 class="couple-name">韩天宇 ❤️ 我的姐姐 黄雨辰</h1>
-                <p class="love-day">我们已经相爱 ${t.years}年${t.months}月${t.days}天</p>
-                <p class="memo">总计 ${t.totalDays} 天</p>
-                <p class="memo">全世界最好的姐姐<br>我永远偏爱你、依赖你、守护你</p>
-                <p class="memo">你是我的温柔，是我的偏爱，也是我的唯一</p>
-                <p class="memo">往后我想一直叫你姐姐</p>
+async function check() {
+  let val = document.getElementById('pwd').value;
+  if (val === correct) {
+    document.getElementById('page').innerHTML = `<div class="heart-page"><div class="heart">❤️</div></div>`;
 
-                <div class="date-box">
-                    <p class="date-title">💌 我们的专属纪念日</p>
-                    <p class="memo">和姐姐正式开始：2026.05.21</p>
-                    <p class="memo">姐姐生日(06.06)：还有 ${birthSisterLeft} 天</p>
-                    <p class="memo">我的生日(03.29)：还有 ${birthMeLeft} 天</p>
-                </div>
+    setTimeout(async () => {
+      const now = new Date();
+      const t = getTogetherTime();
+      let birthSisterLeft = Math.ceil((birthdaySister - now) / (1000 * 60 * 60 * 24));
+      if (birthSisterLeft < 0) birthSisterLeft += 365;
+      let birthMeLeft = Math.ceil((birthdayMe - now) / (1000 * 60 * 60 * 24));
+      if (birthMeLeft < 0) birthMeLeft += 365;
+      const periodInfo = getPeriodTips();
+      const photoList = await getPhotos();
 
-                <div class="period-box">
-                    <p class="date-title">🩸 姐姐生理期记录</p>
-                    <p class="memo">距离下次生理期：${periodInfo.nextDays} 天</p>
-                    <p class="memo" style="color:${periodInfo.color};font-weight:bold">${periodInfo.status}</p>
-                    <input class="period-input" type="date" id="period-date" value="${lastPeriod}">
-                    <p class="memo" style="font-size:14px;margin-top:8px">姐姐可自己更新生理期日期</p>
-                </div>
+      document.getElementById('page').innerHTML = `
+      <div class="content">
+        <h1 class="couple-name">韩天宇 ❤️ 我的姐姐 黄雨辰</h1>
+        <p class="love-day">我们已经相爱 ${t.years}年${t.months}月${t.days}天</p>
+        <p class="memo">总计 ${t.totalDays} 天</p>
+        <p class="memo">全世界最好的姐姐<br>我永远偏爱你、依赖你、守护你</p>
+        <p class="memo">你是我的温柔，是我的偏爱，也是我的唯一</p>
+        <p class="memo">往后我想一直叫你姐姐</p>
 
-                <div class="photo-wall">
-                    <p class="photo-title">📸 我们的合照（上传后立刻显示）</p>
-                    <div class="photos" id="photo-container"></div>
-                    <div class="upload-box">
-                        <input type="file" id="file-input" accept="image/*">
-                        <label for="file-input" class="upload-btn">✨ 上传合照</label>
-                    </div>
-                </div>
-            </div>`;
+        <div class="date-box">
+          <p class="date-title">💌 我们的专属纪念日</p>
+          <p class="memo">和姐姐正式开始：2026.05.21</p>
+          <p class="memo">姐姐生日(06.06)：还有 ${birthSisterLeft} 天</p>
+          <p class="memo">我的生日(03.29)：还有 ${birthMeLeft} 天</p>
+        </div>
 
-            // 读取本地存储（最简单稳定，上传完立刻显示）
-            let photoList = JSON.parse(localStorage.getItem("love-photos")) || [];
-            const container = document.getElementById("photo-container");
-            photoList.forEach(url=>{
-                container.innerHTML += `<img src="${url}" alt="合照">`;
-            });
+        <div class="period-box">
+          <p class="date-title">🩸 姐姐生理期记录</p>
+          <p class="memo">距离下次生理期：${periodInfo.nextDays} 天</p>
+          <p class="memo" style="color:${periodInfo.color};font-weight:bold">${periodInfo.status}</p>
+          <input class="period-input" type="date" id="period-date" value="${lastPeriod}">
+          <p class="memo" style="font-size:14px;margin-top:8px">姐姐可自己更新生理期日期</p>
+        </div>
 
-            // 上传照片
-            document.getElementById("file-input").onchange = async (e)=>{
-                const file = e.target.files[0];
-                if(!file)return;
-                const url = await uploadImage(file);
-                photoList.push(url);
-                localStorage.setItem("love-photos", JSON.stringify(photoList));
-                container.innerHTML += `<img src="${url}" alt="合照">`;
-            }
+        <div class="photo-wall">
+          <p class="photo-title">📸 我们的合照（云端共享）</p>
+          <div class="photos" id="photo-container"></div>
+          <div class="upload-box">
+            <input type="file" id="file-input" accept="image/*">
+            <label for="file-input" class="upload-btn">✨ 上传合照</label>
+          </div>
+        </div>
+      </div>`;
 
-            // 更新生理期
-            document.getElementById("period-date").onchange = (e)=>{
-                lastPeriod = e.target.value;
-                localStorage.setItem("lastPeriod",lastPeriod);
-                alert("姐姐，生理期已更新～");
-                location.reload();
-            }
-        },3000);
-    }else{
-        alert("密码不对～只有我的姐姐才能进来哦");
-    }
+      const container = document.getElementById("photo-container");
+      photoList.forEach(url => {
+        container.innerHTML += `<img src="${url}" alt="合照">`;
+      });
+
+      document.getElementById("file-input").onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const url = await uploadImage(file);
+        const newPhotos = [...photoList, url];
+        await savePhotos(newPhotos);
+        container.innerHTML += `<img src="${url}" alt="合照">`;
+        alert("✅ 上传成功！两边都能看到啦！");
+      };
+
+      document.getElementById("period-date").onchange = (e) => {
+        lastPeriod = e.target.value;
+        localStorage.setItem("lastPeriod", lastPeriod);
+        alert("✅ 生理期已更新");
+        location.reload();
+      };
+    }, 3000);
+  } else {
+    alert("密码不对～只有我的姐姐才能进来哦");
+  }
 }
 </script>
 </body>
