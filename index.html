@@ -28,7 +28,7 @@
             padding:12px 24px;border-radius:16px;font-size:16px;cursor:pointer
         }
 
-        /* ========== 三秒心动加载动画 ========== */
+        /* 三秒心动 稳定版 */
         .heart-page{
             min-height:100vh;
             background:#fce7f3;
@@ -91,7 +91,7 @@
             transform:rotate(45deg);font-size:12px;font-weight:bold;
         }
 
-        /* ========== 超级电子小狗 ========== */
+        /* 电子小狗 */
         .pet{
             position:fixed;z-index:999;cursor:pointer;
             transition:all 0.5s ease;
@@ -128,25 +128,19 @@
             animation:wag 1s infinite alternate;
         }
         .pet-status{
-            position:absolute;top:-40px;left:50%;transform:translate(-50%);
+            position:absolute;top:-40px;left:50%;transform: translate(-50%);
             background:#fff;padding:6px 10px;border-radius:12px;font-size:12px;
             white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.15);
-            animation:bubble 0.3s ease;
         }
         .pet-bubble{
             position:absolute;top:-70px;left:50%;transform: translate(-50%);
             background:#fff;padding:8px 12px;border-radius:16px;font-size:13px;
             white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.15);
-            animation:bubble 0.5s ease;
             max-width:200px;
         }
         @keyframes wag{
             0%{transform:rotate(-20deg)}
             100%{transform:rotate(20deg)}
-        }
-        @keyframes bubble{
-            0%{transform:translate(-50%) scale(0);opacity:0}
-            100%{transform:translate(-50%) scale(1);opacity:1}
         }
         @keyframes dance{
             0%{transform:rotate(0deg) translateY(0)}
@@ -162,7 +156,7 @@
             animation-duration:0.2s;
         }
 
-        /* ========== 爱情时间胶囊 ========== */
+        /* 时间胶囊 */
         .capsule-input{
             width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;
             margin-bottom:10px;resize:none;height:100px;
@@ -187,6 +181,7 @@
 </head>
 <body>
 
+<!-- 【密码登录框 完整保留！！！】 -->
 <div id="page" class="login">
     <div class="box">
         <h1>🔒 黄帝大人的专属小世界</h1>
@@ -198,9 +193,7 @@
 
 <script>
 const correct = "0329";
-// ✅ 精确日期：2026年5月21日是第1天
 const togetherStart = new Date("2026-05-21T00:00:00");
-// 生日自动跨年计算
 const birthdaySister = new Date(new Date().getFullYear()+"-06-06T00:00:00");
 const birthdayMe = new Date(new Date().getFullYear()+"-03-29T00:00:00");
 
@@ -229,44 +222,24 @@ let petY = Math.random()*60 + 20;
 let isDancing = false;
 let longPressTimer = null;
 
-const dogWords = [
-    "姐姐好漂亮呀～","小韩哥哥最帅了！","汪汪汪！想你们啦","要抱抱要亲亲～",
-    "今天也要开心哦","姐姐不要生气嘛","小狗狗永远爱你们","快摸摸我呀～",
-    "肚子饿饿，要吃肉肉","陪我玩好不好？"
-];
-const loveWords = [
-    "姐姐是藏在我心底的温柔与偏爱","朝朝暮暮，岁岁年年，只想黏着姐姐",
-    "我姐姐你过来我偷偷告诉你个小秘密：我喜欢你~","遇见姐姐，是我这辈子最大的幸运",
-    "姐姐你今天好piu 亮啊！！亲亲","姐姐！姐姐！要香香~嘻嘻嘻",
-    "姐姐是天，姐姐是地，绝对不要惹姐姐生气！！！！"
-];
+const dogWords = ["姐姐好漂亮呀～","小韩哥哥最帅了！","汪汪汪！想你们啦","要抱抱要亲亲～","今天也要开心哦","姐姐不要生气嘛","小狗狗永远爱你们","快摸摸我呀～","肚子饿饿，要吃肉肉","陪我玩好不好？"];
+const loveWords = ["姐姐是藏在我心底的温柔与偏爱","朝朝暮暮，岁岁年年，只想黏着姐姐","我姐姐你过来我偷偷告诉你个小秘密：我喜欢你~","遇见姐姐，是我这辈子最大的幸运","姐姐你今天好piu 亮啊！！亲亲","姐姐！姐姐！要香香~嘻嘻嘻","姐姐是天，姐姐是地，绝对不要惹姐姐生气！！！！"];
 const luckList = ["💖 甜蜜模式：今天适合黏着姐姐撒娇","🥰 宠溺模式：今天要无条件宠姐姐","💞 心动模式：今天会格外想念对方","✨ 安稳模式：平平淡淡，一直相爱"];
 const truthDare = ["真心话：你最喜欢我哪一点？","大冒险：亲对方一下","真心话：你第一次见我是什么感觉？","大冒险：说一句最肉麻的情话","真心话：你想我了吗？","大冒险：抱对方10秒钟","真心话：你觉得我哪里最可爱？","大冒险：给对方唱首歌"];
-// 美食选项
 const luckOptions = ["火锅","烧烤","奶茶","炸鸡","披萨","螺蛳粉","日料","甜品"];
 const loveLetter = "亲爱的姐姐：\n从遇见你的那一刻起，我的世界就变得不一样了。\n你是我的温柔，是我的偏爱，是我的唯一。\n爱你的小韩";
 
-// ✅ 修复时区问题，精确计算天数
+// 相爱天数：今天2026.5.21 = 0年0月1天
 function getTogetherTime(){
     const now = new Date();
-    // 统一转为本地时间戳计算，避免时区误差
     const nowTime = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     const startTime = new Date(togetherStart.getFullYear(), togetherStart.getMonth(), togetherStart.getDate()).getTime();
-    
     let years = 0, months = 0, days = 0;
     let start = new Date(togetherStart);
-    
-    while (new Date(start.getFullYear()+1, start.getMonth(), start.getDate()) <= now) {
-        years++; start.setFullYear(start.getFullYear()+1);
-    }
-    while (new Date(start.getFullYear(), start.getMonth()+1, start.getDate()) <= now) {
-        months++; start.setMonth(start.getMonth()+1);
-    }
-    
-    // 当天算第1天
+    while (new Date(start.getFullYear()+1, start.getMonth(), start.getDate()) <= now) { years++; start.setFullYear(start.getFullYear()+1); }
+    while (new Date(start.getFullYear(), start.getMonth()+1, start.getDate()) <= now) { months++; start.setMonth(start.getMonth()+1); }
     days = Math.floor((nowTime - startTime) / (1000*60*60*24)) + 1;
-    const totalDays = Math.max(0, days);
-    return {years,months,days,totalDays};
+    return {years,months,days,totalDays:days};
 }
 
 function getPeriodTips(){
@@ -282,168 +255,61 @@ function getPeriodTips(){
 }
 
 function initSuperPet(){
-    // 先移除已存在的宠物，避免重复创建
-    const oldPet = document.getElementById("pet");
-    if(oldPet) oldPet.remove();
-    
+    const oldPet = document.getElementById("pet"); if(oldPet) oldPet.remove();
     const pet = document.createElement("div");
-    pet.className = "pet";
-    pet.id = "pet";
-    pet.style.left = petX + "%";
-    pet.style.top = petY + "%";
-    pet.innerHTML = `
-        <div class="pet-status" id="pet-status">🐶 Lv.${petLevel} 开心值：${Math.round(petHappiness)}%</div>
-        <div class="dog-body">
-            <div class="dog-head">
-                <div class="dog-ear left"></div>
-                <div class="dog-ear right"></div>
-                <div class="dog-eye left"></div>
-                <div class="dog-eye right"></div>
-                <div class="dog-nose"></div>
-            </div>
-            <div class="dog-tail"></div>
-        </div>`;
+    pet.className = "pet"; pet.id = "pet";
+    pet.style.left = petX + "%"; pet.style.top = petY + "%";
+    pet.innerHTML = `<div class="pet-status" id="pet-status">🐶 Lv.${petLevel} 开心值：${Math.round(petHappiness)}%</div><div class="dog-body"><div class="dog-head"><div class="dog-ear left"></div><div class="dog-ear right"></div><div class="dog-eye left"></div><div class="dog-eye right"></div><div class="dog-nose"></div></div><div class="dog-tail"></div></div>`;
     document.body.appendChild(pet);
-    
     setInterval(()=>{
-        if(!isDancing){
-            petX = Math.random()*80 + 10;
-            petY = Math.random()*60 + 20;
-            document.getElementById("pet").style.left = petX + "%";
-            document.getElementById("pet").style.top = petY + "%";
-        }
-        petHappiness = Math.max(0, petHappiness - 0.05);
-        updatePetStatus();
-        if(petHappiness >= 100 && Math.random() < 0.1 && !isDancing){startDance();}
-    }, 3000);
-    
-    setInterval(()=>{if(Math.random() < 0.3){showDogBubble(dogWords[Math.floor(Math.random()*dogWords.length)]);}}, 10000);
-    
-    pet.onclick = function(){
-        clearTimeout(longPressTimer);
-        petHappiness = Math.min(100, petHappiness + 3);
-        petExp += 1;
-        checkLevelUp();
-        this.classList.add("happy");
-        setTimeout(()=>this.classList.remove("happy"), 500);
-        updatePetStatus();
-    }
-    
-    pet.onmousedown = pet.ontouchstart = function(){
-        longPressTimer = setTimeout(()=>{
-            petHappiness = Math.min(100, petHappiness + 10);
-            petExp += 5;
-            checkLevelUp();
-            showDogBubble("好舒服呀～谢谢姐姐/哥哥摸摸🥰");
-            updatePetStatus();
-        }, 500);
-    }
-    
-    pet.onmouseup = pet.ontouchend = function(){clearTimeout(longPressTimer);}
+        if(!isDancing){petX=Math.random()*80+10;petY=Math.random()*60+20;pet.style.left=petX+"%";pet.style.top=petY+"%";}
+        petHappiness=Math.max(0,petHappiness-0.05);updatePetStatus();
+        if(petHappiness>=100&&Math.random()<0.1&&!isDancing)startDance();
+    },3000);
+    setInterval(()=>{if(Math.random()<0.3)showDogBubble(dogWords[Math.floor(Math.random()*dogWords.length)]);},10000);
+    pet.onclick=()=>{petHappiness=Math.min(100,petHappiness+3);petExp+=1;checkLevelUp();pet.classList.add("happy");setTimeout(()=>pet.classList.remove("happy"),500);updatePetStatus();};
+    pet.onmousedown=pet.ontouchstart=()=>{longPressTimer=setTimeout(()=>{petHappiness=Math.min(100,petHappiness+10);petExp+=5;checkLevelUp();showDogBubble("好舒服呀～谢谢姐姐🥰");updatePetStatus();},500);};
+    pet.onmouseup=pet.ontouchend=()=>clearTimeout(longPressTimer);
 }
+function startDance(){isDancing=true;const pet=document.getElementById("pet");pet.classList.add("dancing");showDogBubble("🎉 我超开心！给你们跳个舞～");setTimeout(()=>{pet.classList.remove("dancing");isDancing=false;petHappiness=80;updatePetStatus();},5000);}
+function showDogBubble(t){const b=document.createElement("div");b.className="pet-bubble";b.innerText=t;document.getElementById("pet").appendChild(b);setTimeout(()=>b.remove(),3000);}
+function checkLevelUp(){const e=petLevel*100;if(petExp>=e){petLevel++;petExp=0;localStorage.setItem("petLevel",petLevel);localStorage.setItem("petExp",petExp);showDogBubble(`🎊 升级啦！Lv.${petLevel}`);}localStorage.setItem("petExp",petExp);}
+function updatePetStatus(){localStorage.setItem("petHappiness",petHappiness);let s;if(petHappiness>=90)s="🐶 超级开心！";else if(petHappiness>=70)s="🐶 很开心～";else if(petHappiness>=40)s="🐶 还不错哦";else if(petHappiness>=20)s="🐶 有点无聊...";else s="🐶 呜呜想你们🥺";const el=document.getElementById("pet-status");if(el)el.innerText=`${s} Lv.${petLevel} 开心值：${Math.round(petHappiness)}%`;}
+function typeWriter(t,eid,s=50){let i=0;const el=document.getElementById(eid);if(!el)return;el.innerHTML="";function type(){if(i<t.length){el.innerHTML+=t[i++];setTimeout(type,s);}}type();}
 
-function startDance(){
-    isDancing = true;
-    const pet = document.getElementById("pet");
-    pet.classList.add("dancing");
-    showDogBubble("🎉 我超开心！给你们跳个舞～");
-    setTimeout(()=>{pet.classList.remove("dancing");isDancing = false;petHappiness = 80;updatePetStatus();}, 5000);
-}
-
-function showDogBubble(text){
-    const oldBubble = document.querySelector(".pet-bubble");
-    if(oldBubble) oldBubble.remove();
-    const bubble = document.createElement("div");
-    bubble.className = "pet-bubble";
-    bubble.innerText = text;
-    document.getElementById("pet").appendChild(bubble);
-    setTimeout(()=>bubble.remove(), 3000);
-}
-
-function checkLevelUp(){
-    const expNeeded = petLevel * 100;
-    if(petExp >= expNeeded){
-        petLevel++;petExp = 0;
-        localStorage.setItem("petLevel", petLevel);localStorage.setItem("petExp", petExp);
-        showDogBubble(`🎊 升级啦！现在是 Lv.${petLevel} 小狗狗！`);
-    }
-    localStorage.setItem("petExp", petExp);
-}
-
-function updatePetStatus(){
-    localStorage.setItem("petHappiness", petHappiness);
-    let status;
-    if(petHappiness >= 90) status = "🐶 超级开心！";
-    else if(petHappiness >= 70) status = "🐶 很开心～";
-    else if(petHappiness >= 40) status = "🐶 还不错哦";
-    else if(petHappiness >= 20) status = "🐶 有点无聊...";
-    else status = "🐶 呜呜，想你们了🥺";
-    const el = document.getElementById("pet-status");
-    if(el) el.innerText = `${status} Lv.${petLevel} 开心值：${Math.round(petHappiness)}%`;
-}
-
-function typeWriter(text, elementId, speed=50){
-    let i = 0;
-    const element = document.getElementById(elementId);
-    if(!element) return;
-    element.innerHTML = "";
-    function type(){if(i < text.length){element.innerHTML += text.charAt(i);i++;setTimeout(type, speed);}}
-    type();
-}
-
-// ✅ 完美三秒心动：CSS动画控制，绝对不卡顿
+// 登录：密码正确 → 三秒心动 → 主页
 function check(){
-    let val = document.getElementById('pwd').value.trim();
+    const val = document.getElementById('pwd').value.trim();
     if(val === correct){
-        // 记住登录状态
-        localStorage.setItem("isLogin", "ok");
-        
-        // 显示三秒心动加载动画
-        document.getElementById('page').innerHTML = `
-        <div class="heart-page" id="heartPage">
-            <div class="heart">❤️</div>
-        </div>`;
-        
-        // 动画结束后自动渲染主页面
-        document.getElementById('heartPage').addEventListener('animationend', function(){
-            renderMain();
-        });
+        localStorage.setItem("isLogin","ok");
+        // 显示爱心动画
+        document.getElementById('page').innerHTML = `<div class="heart-page" id="hp"><div class="heart">❤️</div></div>`;
+        document.getElementById('hp').addEventListener("animationend",renderMain);
     }else{
         alert("密码不对～只有黄帝大人才能进来哦");
     }
 }
 
-// ✅ 自动登录（登录过一次就不用再输密码）
+// 打开自动登录
 window.onload = function(){
-    if(localStorage.getItem("isLogin") === "ok"){
-        // 自动登录也显示三秒心动
-        document.getElementById('page').innerHTML = `
-        <div class="heart-page" id="heartPage">
-            <div class="heart">❤️</div>
-        </div>`;
-        
-        document.getElementById('heartPage').addEventListener('animationend', function(){
-            renderMain();
-        });
+    if(localStorage.getItem("isLogin")==="ok"){
+        document.getElementById('page').innerHTML = `<div class="heart-page" id="hp"><div class="heart">❤️</div></div>`;
+        document.getElementById('hp').addEventListener("animationend",renderMain);
     }
 }
 
+// 渲染主页
 function renderMain(){
-    const now = new Date();
-    const t = getTogetherTime();
-    
-    // 生日自动跨年计算
-    let birthSisterLeft = Math.ceil((birthdaySister - now) / (1000*60*60*24));
-    if(birthSisterLeft < 0) birthSisterLeft += 365;
-    let birthMeLeft = Math.ceil((birthdayMe - now) / (1000*60*60*24));
-    if(birthMeLeft < 0) birthMeLeft += 365;
-    
-    const periodInfo = getPeriodTips();
-    const randomWord = loveWords[Math.floor(Math.random()*loveWords.length)];
-    const todayLuck = luckList[Math.floor(Math.random()*luckList.length)];
-    const today = now.toDateString();
-    const canLove = today !== lastLoveDate;
-    const canMood = today !== lastMoodDate;
+    const now=new Date();
+    const t=getTogetherTime();
+    let birthSisterLeft=Math.ceil((birthdaySister-now)/(1000*60*60*24));if(birthSisterLeft<0)birthSisterLeft+=365;
+    let birthMeLeft=Math.ceil((birthdayMe-now)/(1000*60*60*24));if(birthMeLeft<0)birthMeLeft+=365;
+    const periodInfo=getPeriodTips();
+    const randomWord=loveWords[Math.floor(Math.random()*loveWords.length)];
+    const todayLuck=luckList[Math.floor(Math.random()*luckList.length)];
+    const today=now.toDateString();
+    const canLove=today!==lastLoveDate;
+    const canMood=today!==lastMoodDate;
 
     document.getElementById('page').innerHTML = `
     <div class="content">
@@ -547,111 +413,28 @@ function renderMain(){
         </div>
     </div>`;
 
-    // 渲染列表
-    const wishList = document.getElementById("wish-list");
-    wishList.innerHTML = "";
-    wishes.forEach((wish,index)=>{
-        wishList.innerHTML += `
-        <div class="wish-item">
-            <input type="checkbox" id="wish-${index}" ${wish.done?"checked":""} onchange="toggleWish(${index})">
-            <label for="wish-${index}">${wish.text}</label>
-        </div>`;
-    });
-    
-    const messageList = document.getElementById("message-list");
-    messageList.innerHTML = "";
-    messages.forEach(msg=>{
-        messageList.innerHTML += `<div class="message-item"><p>${msg.text}</p><p class="message-time">${msg.time}</p></div>`;
-    });
-    
-    const capsuleList = document.getElementById("capsule-list");
-    capsuleList.innerHTML = "";
-    capsules.forEach((capsule,index)=>{
-        const openDate = new Date(capsule.openDate);
-        const now = new Date();
-        const canOpen = now >= openDate;
-        const daysLeft = Math.ceil((openDate - now) / (1000*60*60*24));
-        capsuleList.innerHTML += `
-        <div class="capsule-item">
-            <div class="capsule-title">${capsule.title || "给未来的信"}</div>
-            <div class="capsule-time">封存时间：${capsule.createTime} | 打开时间：${capsule.openDate}</div>
-            ${canOpen ? `<button class="btn" onclick="openCapsule(${index})">📩 打开胶囊</button><div id="capsule-content-${index}" style="display:none;margin-top:10px" class="capsule-content"></div>` : `<p class="memo" style="margin-top:10px">⏳ 还有 ${daysLeft} 天才能打开</p>`}
-        </div>`;
-    });
-    
-    // 初始化打字机和宠物
-    typeWriter(loveLetter, "loveLetter", 80);
+    // 渲染心愿、留言、胶囊
+    const wishList=document.getElementById("wish-list");wishList.innerHTML="";wishes.forEach((w,i)=>wishList.innerHTML+=`<div class="wish-item"><input type="checkbox" id="wish-${i}" ${w.done?"checked":""} onchange="toggleWish(${i})"><label for="wish-${i}">${w.text}</label></div>`);
+    const msgList=document.getElementById("message-list");msgList.innerHTML="";messages.forEach(m=>msgList.innerHTML+=`<div class="message-item"><p>${m.text}</p><p class="message-time">${m.time}</p></div>`);
+    const capList=document.getElementById("capsule-list");capList.innerHTML="";capsules.forEach((c,i)=>{const od=new Date(c.openDate);const canOpen=new Date()>=od;const daysLeft=Math.ceil((od-new Date())/(1000*60*60*24));capList.innerHTML+=`<div class="capsule-item"><div class="capsule-title">${c.title||"给未来的信"}</div><div class="capsule-time">封存：${c.createTime}｜打开：${c.openDate}</div>${canOpen?`<button class="btn" onclick="openCapsule(${i})">打开</button><div id="cap${i}" style="display:none;margin-top:10px" class="capsule-content"></div>`:`<p class="memo">⏳ 还有${daysLeft}天</p>`}</div>`;});
+    typeWriter(loveLetter,"loveLetter",80);
     initSuperPet();
 }
 
 // 全局函数
-window.addMiss = ()=>{missCount++;localStorage.setItem("missCount",missCount);document.getElementById("miss-num").innerText = missCount;};
-window.refreshWord = ()=>{const w=loveWords[Math.floor(Math.random()*loveWords.length)];document.querySelector(".fun-box .memo:nth-child(2)").innerText="今日情话："+w;};
-window.sayLove = ()=>{
-    const today=new Date().toDateString();
-    if(today!==lastLoveDate){
-        loveDays++;lastLoveDate=today;
-        localStorage.setItem("loveDays",loveDays);localStorage.setItem("lastLoveDate",lastLoveDate);
-        alert("❤️ 我爱你！今天的爱意已收到～");
-        renderMain();
-    }
-};
-window.toggleWish = (i)=>{wishes[i].done=!wishes[i].done;localStorage.setItem("wishes",JSON.stringify(wishes));};
-window.spinLuckWheel = ()=>{
-    const w=document.getElementById("luckWheel");
-    const a=Math.random()*360+1440;
-    w.style.transition="transform 4s ease-out";
-    w.style.transform=`rotate(${a}deg)`;
-    setTimeout(()=>{document.getElementById("luck-result").innerText="今天就吃："+luckOptions[Math.floor(Math.random()*luckOptions.length)];},4000);
-};
-window.spinGameWheel = ()=>{
-    const w=document.getElementById("gameWheel");
-    const a=Math.random()*360+1440;
-    w.style.transition="transform 4s ease-out";
-    w.style.transform=`rotate(${a}deg)`;
-    setTimeout(()=>{document.getElementById("game-result").innerText=truthDare[Math.floor(Math.random()*truthDare.length)];},4000);
-};
-window.feedPet = ()=>{petHappiness=Math.min(100,petHappiness+25);petExp+=10;checkLevelUp();showDogBubble("🍖 谢谢姐姐～");updatePetStatus();};
-window.playWithPet = ()=>{petHappiness=Math.min(100,petHappiness+15);petExp+=8;checkLevelUp();showDogBubble("🎾 好开心！");updatePetStatus();};
-window.sendMessage = ()=>{
-    const t=document.getElementById("message-input").value.trim();
-    if(!t)return;
-    const now=new Date();
-    messages.unshift({text:t,time:now.toLocaleString()});
-    localStorage.setItem("messages",JSON.stringify(messages));
-    renderMain();
-};
-window.setMood = (m)=>{
-    const today=new Date().toDateString();
-    if(today!==lastMoodDate){
-        todayMood=m;lastMoodDate=today;
-        localStorage.setItem("todayMood",todayMood);localStorage.setItem("lastMoodDate",lastMoodDate);
-        alert("✅ 心情打卡成功！");
-        renderMain();
-    }
-};
-window.createCapsule = ()=>{
-    const c=document.getElementById("capsule-content").value.trim();
-    const d=document.getElementById("capsule-date").value;
-    if(!c||!d){alert("请填写信件内容和打开日期！");return;}
-    capsules.unshift({content:c,openDate:d,createTime:new Date().toLocaleString(),title:`写给${d}的信`});
-    localStorage.setItem("loveCapsules",JSON.stringify(capsules));
-    alert("✅ 时间胶囊封存成功！到了那天就能打开啦～");
-    renderMain();
-};
-window.openCapsule = (i)=>{
-    const el=document.getElementById("capsule-content-"+i);
-    el.style.display=el.style.display==="none"?"block":"none";
-    el.innerText=capsules[i].content;
-};
-document.addEventListener("change", (e)=>{
-    if(e.target.id === "period-date"){
-        lastPeriod = e.target.value;
-        localStorage.setItem("lastPeriod",lastPeriod);
-        alert("✅ 生理期已更新");
-        renderMain();
-    }
-});
+window.addMiss=()=>{missCount++;localStorage.setItem("missCount",missCount);document.getElementById("miss-num").innerText=missCount;};
+window.refreshWord=()=>{const w=loveWords[Math.floor(Math.random()*loveWords.length)];document.querySelector(".fun-box .memo:nth-child(2)").innerText="今日情话："+w;};
+window.sayLove=()=>{const today=new Date().toDateString();if(today!==lastLoveDate){loveDays++;lastLoveDate=today;localStorage.setItem("loveDays",loveDays);localStorage.setItem("lastLoveDate",lastLoveDate);alert("❤️ 我爱你！");renderMain();}};
+window.toggleWish=i=>{wishes[i].done=!wishes[i].done;localStorage.setItem("wishes",JSON.stringify(wishes));};
+window.spinLuckWheel=()=>{const w=document.getElementById("luckWheel");const a=Math.random()*360+1440;w.style.transition="transform 4s ease-out";w.style.transform=`rotate(${a}deg)`;setTimeout(()=>document.getElementById("luck-result").innerText="今天吃："+luckOptions[Math.floor(Math.random()*luckOptions.length)],4000);};
+window.spinGameWheel=()=>{const w=document.getElementById("gameWheel");const a=Math.random()*360+1440;w.style.transition="transform 4s ease-out";w.style.transform=`rotate(${a}deg)`;setTimeout(()=>document.getElementById("game-result").innerText=truthDare[Math.floor(Math.random()*truthDare.length)],4000);};
+window.feedPet=()=>{petHappiness=Math.min(100,petHappiness+25);petExp+=10;checkLevelUp();showDogBubble("🍖 谢谢姐姐～");updatePetStatus();};
+window.playWithPet=()=>{petHappiness=Math.min(100,petHappiness+15);petExp+=8;checkLevelUp();showDogBubble("🎾 好开心！");updatePetStatus();};
+window.sendMessage=()=>{const t=document.getElementById("message-input").value.trim();if(!t)return;const now=new Date();messages.unshift({text:t,time:now.toLocaleString()});localStorage.setItem("messages",JSON.stringify(messages));renderMain();};
+window.setMood=m=>{const today=new Date().toDateString();if(today!==lastMoodDate){todayMood=m;lastMoodDate=today;localStorage.setItem("todayMood",todayMood);localStorage.setItem("lastMoodDate",lastMoodDate);alert("✅ 打卡成功");renderMain();}};
+window.createCapsule=()=>{const c=document.getElementById("capsule-content").value.trim();const d=document.getElementById("capsule-date").value;if(!c||!d){alert("请填写内容和日期");return;}capsules.unshift({content:c,openDate:d,createTime:new Date().toLocaleString(),title:`写给${d}的信`});localStorage.setItem("loveCapsules",JSON.stringify(capsules));alert("✅ 胶囊封存成功");renderMain();};
+window.openCapsule=i=>{const el=document.getElementById("cap"+i);el.style.display=el.style.display==="none"?"block":"none";el.innerText=capsules[i].content;};
+document.addEventListener("change",e=>{if(e.target.id==="period-date"){lastPeriod=e.target.value;localStorage.setItem("lastPeriod",lastPeriod);alert("✅ 生理期已更新");renderMain();}});
 </script>
 </body>
 </html>
