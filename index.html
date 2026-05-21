@@ -28,20 +28,6 @@
             padding:12px 24px;border-radius:16px;font-size:16px;cursor:pointer
         }
 
-        .heart-page{
-            min-height:100vh;
-            background:#fce7f3;
-            display:flex;align-items:center;justify-content:center;
-        }
-        .heart{
-            font-size:140px;color:#f43f5e;
-            animation:beat 0.6s infinite;
-        }
-        @keyframes beat{
-            0%,100%{transform:scale(1)}
-            50%{transform:scale(1.2)}
-        }
-
         .content{
             min-height:100vh;
             background:linear-gradient(#fbcfe8,#fff);
@@ -184,18 +170,18 @@
     <div class="box">
         <h1>🔒 黄帝大人的专属小世界</h1>
         <p>只有姐姐能进入哦</p>
-        <input type="password" id="pwd" placeholder="输入密码">
+        <input type="password" id="pwd" placeholder="输入密码" autocomplete="off">
         <button onclick="check()">进入</button>
     </div>
 </div>
 
 <script>
 const correct = "0329";
-// ✅ 已修正：在一起起始日期为2026年5月21日
-const togetherStart = new Date("2026-05-21");
-// 生日自动按当前年份计算，过了自动算下一年
-const birthdaySister = new Date(new Date().getFullYear()+"-06-06");
-const birthdayMe = new Date(new Date().getFullYear()+"-03-29");
+// ✅ 精确日期：2026年5月21日是第1天
+const togetherStart = new Date("2026-05-21T00:00:00");
+// 生日自动跨年计算
+const birthdaySister = new Date(new Date().getFullYear()+"-06-06T00:00:00");
+const birthdayMe = new Date(new Date().getFullYear()+"-03-29T00:00:00");
 
 let lastPeriod = localStorage.getItem("lastPeriod") || "2026-05-06";
 const cycle = 28;
@@ -239,22 +225,29 @@ const truthDare = ["真心话：你最喜欢我哪一点？","大冒险：亲对
 const luckOptions = ["火锅","烧烤","奶茶","炸鸡","披萨","螺蛳粉","日料","甜品"];
 const loveLetter = "亲爱的姐姐：\n从遇见你的那一刻起，我的世界就变得不一样了。\n你是我的温柔，是我的偏爱，是我的唯一。\n爱你的小韩";
 
-// ✅ 精确天数计算：当天算第1天，每天自动+1
+// ✅ 修复时区问题，精确计算天数
 function getTogetherTime(){
     const now = new Date();
-    let start = new Date(togetherStart);
+    // 统一转为本地时间戳计算，避免时区误差
+    const nowTime = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startTime = new Date(togetherStart.getFullYear(), togetherStart.getMonth(), togetherStart.getDate()).getTime();
+    
     let years = 0, months = 0, days = 0;
+    let start = new Date(togetherStart);
+    
     while (new Date(start.getFullYear()+1, start.getMonth(), start.getDate()) <= now) {
         years++; start.setFullYear(start.getFullYear()+1);
     }
     while (new Date(start.getFullYear(), start.getMonth()+1, start.getDate()) <= now) {
         months++; start.setMonth(start.getMonth()+1);
     }
-    days = Math.floor((now - start) / (1000*60*60*24)) + 1;
-    const totalDays = Math.max(0, Math.floor((now - togetherStart) / (1000*60*60*24)) + 1;
+    
+    // 当天算第1天
+    days = Math.floor((nowTime - startTime) / (1000*60*60*24)) + 1;
+    const totalDays = Math.max(0, days);
     return {years,months,days,totalDays};
 }
-// ✅ 生理期自动计算下次日期和状态
+
 function getPeriodTips(){
     const last = new Date(lastPeriod);
     const now = new Date();
@@ -268,6 +261,10 @@ function getPeriodTips(){
 }
 
 function initSuperPet(){
+    // 先移除已存在的宠物，避免重复创建
+    const oldPet = document.getElementById("pet");
+    if(oldPet) oldPet.remove();
+    
     const pet = document.createElement("div");
     pet.className = "pet";
     pet.id = "pet";
@@ -286,6 +283,7 @@ function initSuperPet(){
             <div class="dog-tail"></div>
         </div>`;
     document.body.appendChild(pet);
+    
     setInterval(()=>{
         if(!isDancing){
             petX = Math.random()*80 + 10;
@@ -297,7 +295,9 @@ function initSuperPet(){
         updatePetStatus();
         if(petHappiness >= 100 && Math.random() < 0.1 && !isDancing){startDance();}
     }, 3000);
+    
     setInterval(()=>{if(Math.random() < 0.3){showDogBubble(dogWords[Math.floor(Math.random()*dogWords.length)]);}}, 10000);
+    
     pet.onclick = function(){
         clearTimeout(longPressTimer);
         petHappiness = Math.min(100, petHappiness + 3);
@@ -307,6 +307,7 @@ function initSuperPet(){
         setTimeout(()=>this.classList.remove("happy"), 500);
         updatePetStatus();
     }
+    
     pet.onmousedown = pet.ontouchstart = function(){
         longPressTimer = setTimeout(()=>{
             petHappiness = Math.min(100, petHappiness + 10);
@@ -316,8 +317,10 @@ function initSuperPet(){
             updatePetStatus();
         }, 500);
     }
+    
     pet.onmouseup = pet.ontouchend = function(){clearTimeout(longPressTimer);}
 }
+
 function startDance(){
     isDancing = true;
     const pet = document.getElementById("pet");
@@ -325,6 +328,7 @@ function startDance(){
     showDogBubble("🎉 我超开心！给你们跳个舞～");
     setTimeout(()=>{pet.classList.remove("dancing");isDancing = false;petHappiness = 80;updatePetStatus();}, 5000);
 }
+
 function showDogBubble(text){
     const oldBubble = document.querySelector(".pet-bubble");
     if(oldBubble) oldBubble.remove();
@@ -334,6 +338,7 @@ function showDogBubble(text){
     document.getElementById("pet").appendChild(bubble);
     setTimeout(()=>bubble.remove(), 3000);
 }
+
 function checkLevelUp(){
     const expNeeded = petLevel * 100;
     if(petExp >= expNeeded){
@@ -343,6 +348,7 @@ function checkLevelUp(){
     }
     localStorage.setItem("petExp", petExp);
 }
+
 function updatePetStatus(){
     localStorage.setItem("petHappiness", petHappiness);
     let status;
@@ -351,238 +357,262 @@ function updatePetStatus(){
     else if(petHappiness >= 40) status = "🐶 还不错哦";
     else if(petHappiness >= 20) status = "🐶 有点无聊...";
     else status = "🐶 呜呜，想你们了🥺";
-    document.getElementById("pet-status").innerText = `${status} Lv.${petLevel} 开心值：${Math.round(petHappiness)}%`;
+    const el = document.getElementById("pet-status");
+    if(el) el.innerText = `${status} Lv.${petLevel} 开心值：${Math.round(petHappiness)}%`;
 }
+
 function typeWriter(text, elementId, speed=50){
     let i = 0;
     const element = document.getElementById(elementId);
+    if(!element) return;
     element.innerHTML = "";
     function type(){if(i < text.length){element.innerHTML += text.charAt(i);i++;setTimeout(type, speed);}}
     type();
 }
 
+// ✅ 修复登录逻辑，直接秒进，无卡顿
 function check(){
-    let val = document.getElementById('pwd').value;
+    let val = document.getElementById('pwd').value.trim();
     if(val === correct){
-        document.getElementById('page').innerHTML = `<div class="heart-page"><div class="heart">❤️</div></div>`;
-        setTimeout(()=>{
-            const now = new Date();
-            const t = getTogetherTime();
-            // ✅ 生日自动倒计时：过了今年自动算下一年
-            let birthSisterLeft = Math.ceil((birthdaySister - now) / (1000*60*60*24));
-            if(birthSisterLeft < 0) birthSisterLeft += 365;
-            let birthMeLeft = Math.ceil((birthdayMe - now) / (1000*60*60*24));
-            if(birthMeLeft < 0) birthMeLeft += 365;
-            const periodInfo = getPeriodTips();
-            const randomWord = loveWords[Math.floor(Math.random()*loveWords.length)];
-            const todayLuck = luckList[Math.floor(Math.random()*luckList.length)];
-            const today = now.toDateString();
-            const canLove = today !== lastLoveDate;
-            const canMood = today !== lastMoodDate;
-
-            document.getElementById('page').innerHTML = `
-            <div class="content">
-                <h1 class="couple-name">小韩 ❤️ 漂亮姐姐 黄雨辰</h1>
-                <p class="love-day">我们已经相爱 ${t.years}年${t.months}月${t.days}天</p>
-                <p class="memo">我们在一起已经 ${t.totalDays} 天啦</p>
-                <div class="memo typewriter" id="loveLetter"></div>
-
-                <div class="date-box">
-                    <p class="date-title">💌 我们的专属纪念日</p>
-                    <p class="memo">和姐姐正式开始：2026.05.21</p>
-                    <p class="memo">姐姐生日(06.06)：还有 ${birthSisterLeft} 天</p>
-                    <p class="memo">我的生日(03.29)：还有 ${birthMeLeft} 天</p>
-                </div>
-
-                <div class="period-box">
-                    <p class="date-title">🩸 姐姐生理期记录</p>
-                    <p class="memo">距离下次生理期：${periodInfo.nextDays} 天</p>
-                    <p class="memo" style="color:${periodInfo.color};font-weight:bold">${periodInfo.status}</p>
-                    <input class="period-input" type="date" id="period-date" value="${lastPeriod}">
-                    <p class="memo" style="font-size:14px;margin-top:8px">姐姐可自己更新生理期日期</p>
-                </div>
-
-                <div class="fun-box">
-                    <p class="date-title">✨ 情侣小乐园</p>
-                    <p class="memo">今日情话：${randomWord}</p>
-                    <p class="memo">今日运势：${todayLuck}</p>
-                    <p class="memo">我已经想姐姐 <span id="miss-num">${missCount}</span> 次啦</p>
-                    <p class="memo">连续说我爱你：${loveDays} 天</p>
-                    <p class="memo">今日心情：${todayMood || "还没打卡"}</p>
-                    <button class="btn" onclick="addMiss()">💓 又想姐姐了 +1</button>
-                    <button class="btn" onclick="refreshWord()">💌 换一句情话</button>
-                    <button class="btn" onclick="sayLove()" ${!canLove?"disabled":""}>💕 今日说我爱你</button>
-                    <button class="btn" onclick="feedPet()">🍖 喂小狗吃东西</button>
-                    <button class="btn" onclick="playWithPet()">🎾 陪小狗玩</button>
-                </div>
-
-                <div class="capsule-box">
-                    <p class="date-title">💌 爱情时间胶囊</p>
-                    <p class="memo">给未来的对方写一封信，到指定日期才能打开</p>
-                    <textarea class="capsule-input" id="capsule-content" placeholder="写下你想对未来的TA说的话..."></textarea>
-                    <input type="date" class="capsule-date" id="capsule-date" min="${new Date().toISOString().split('T')[0]}">
-                    <button class="btn" onclick="createCapsule()">🔒 封存时间胶囊</button>
-                    <div id="capsule-list"></div>
-                </div>
-
-                <div class="luck-box">
-                    <p class="date-title">🎡 爱情幸运转盘</p>
-                    <div class="wheel" id="luckWheel">
-                        <div class="wheel-sector" style="transform:rotate(0deg);background:#ffb6c1"><div class="wheel-text">火锅</div></div>
-                        <div class="wheel-sector" style="transform:rotate(45deg);background:#ffc0cb"><div class="wheel-text">烧烤</div></div>
-                        <div class="wheel-sector" style="transform:rotate(90deg);background:#ffb6c1"><div class="wheel-text">奶茶</div></div>
-                        <div class="wheel-sector" style="transform:rotate(135deg);background:#ffc0cb"><div class="wheel-text">炸鸡</div></div>
-                        <div class="wheel-sector" style="transform:rotate(180deg);background:#ffb6c1"><div class="wheel-text">披萨</div></div>
-                        <div class="wheel-sector" style="transform:rotate(225deg);background:#ffc0cb"><div class="wheel-text">螺蛳粉</div></div>
-                        <div class="wheel-sector" style="transform:rotate(270deg);background:#ffb6c1"><div class="wheel-text">日料</div></div>
-                        <div class="wheel-sector" style="transform:rotate(315deg);background:#ffc0cb"><div class="wheel-text">甜品</div></div>
-                    </div>
-                    <button class="btn" onclick="spinLuckWheel()">🎲 帮我决定吃什么</button>
-                    <p id="luck-result" class="memo" style="margin-top:15px;font-weight:bold"></p>
-                </div>
-
-                <div class="wish-box">
-                    <p class="date-title">📝 我们的心愿清单</p>
-                    <div id="wish-list"></div>
-                </div>
-
-                <div class="message-box">
-                    <p class="date-title">💬 私密留言板</p>
-                    <textarea class="message-input" id="message-input" placeholder="给对方留一句悄悄话..."></textarea>
-                    <button class="btn" onclick="sendMessage()">发送留言</button>
-                    <div id="message-list"></div>
-                </div>
-
-                <div class="game-box">
-                    <p class="date-title">🎮 真心话大冒险</p>
-                    <div class="wheel" id="gameWheel">
-                        <div class="wheel-sector" style="transform:rotate(0deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
-                        <div class="wheel-sector" style="transform:rotate(45deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
-                        <div class="wheel-sector" style="transform:rotate(90deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
-                        <div class="wheel-sector" style="transform:rotate(135deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
-                        <div class="wheel-sector" style="transform:rotate(180deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
-                        <div class="wheel-sector" style="transform:rotate(225deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
-                        <div class="wheel-sector" style="transform:rotate(270deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
-                        <div class="wheel-sector" style="transform:rotate(315deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
-                    </div>
-                    <button class="btn" onclick="spinGameWheel()">🎲 开始转动</button>
-                    <p id="game-result" class="memo" style="margin-top:15px;font-weight:bold"></p>
-                </div>
-
-                <div class="fun-box">
-                    <p class="date-title">😊 每日心情打卡</p>
-                    <div class="mood-buttons">
-                        <button class="mood-btn" onclick="setMood('😊')" ${!canMood?"disabled":""}>😊</button>
-                        <button class="mood-btn" onclick="setMood('😃')" ${!canMood?"disabled":""}>😃</button>
-                        <button class="mood-btn" onclick="setMood('😢')" ${!canMood?"disabled":""}>😢</button>
-                        <button class="mood-btn" onclick="setMood('😠')" ${!canMood?"disabled":""}>😠</button>
-                        <button class="mood-btn" onclick="setMood('🥰')" ${!canMood?"disabled":""}>🥰</button>
-                    </div>
-                    <p class="memo" style="font-size:14px">每天只能打卡一次哦</p>
-                </div>
-            </div>`;
-
-            const wishList = document.getElementById("wish-list");
-            wishes.forEach((wish,index)=>{
-                wishList.innerHTML += `
-                <div class="wish-item">
-                    <input type="checkbox" id="wish-${index}" ${wish.done?"checked":""} onchange="toggleWish(${index})">
-                    <label for="wish-${index}">${wish.text}</label>
-                </div>`;
-            });
-            const messageList = document.getElementById("message-list");
-            messages.forEach(msg=>{
-                messageList.innerHTML += `<div class="message-item"><p>${msg.text}</p><p class="message-time">${msg.time}</p></div>`;
-            });
-            const capsuleList = document.getElementById("capsule-list");
-            capsules.forEach((capsule,index)=>{
-                const openDate = new Date(capsule.openDate);
-                const now = new Date();
-                const canOpen = now >= openDate;
-                const daysLeft = Math.ceil((openDate - now) / (1000*60*60*24));
-                capsuleList.innerHTML += `
-                <div class="capsule-item">
-                    <div class="capsule-title">${capsule.title || "给未来的信"}</div>
-                    <div class="capsule-time">封存时间：${capsule.createTime} | 打开时间：${capsule.openDate}</div>
-                    ${canOpen ? `<button class="btn" onclick="openCapsule(${index})">📩 打开胶囊</button><div id="capsule-content-${index}" style="display:none;margin-top:10px" class="capsule-content"></div>` : `<p class="memo" style="margin-top:10px">⏳ 还有 ${daysLeft} 天才能打开</p>`}
-                </div>`;
-            });
-            typeWriter(loveLetter, "loveLetter", 80);
-
-            window.addMiss = function(){missCount++;localStorage.setItem("missCount",missCount);document.getElementById("miss-num").innerText = missCount;}
-            window.refreshWord = function(){location.reload();}
-            window.sayLove = function(){
-                if(canLove){
-                    loveDays++;lastLoveDate = today;
-                    localStorage.setItem("loveDays",loveDays);localStorage.setItem("lastLoveDate",lastLoveDate);
-                    alert("❤️ 我爱你！今天的爱意已收到～");location.reload();
-                }
-            }
-            window.toggleWish = function(index){wishes[index].done = !wishes[index].done;localStorage.setItem("wishes",JSON.stringify(wishes));}
-            window.spinLuckWheel = function(){
-                const wheel = document.getElementById("luckWheel");
-                const angle = Math.random()*360 + 1440;
-                wheel.style.transition = "transform 4s ease-out";
-                wheel.style.transform = `rotate(${angle}deg)`;
-                setTimeout(()=>{
-                    const result = luckOptions[Math.floor(Math.random()*luckOptions.length)];
-                    document.getElementById("luck-result").innerText = "今天就吃：" + result;
-                },4000);
-            }
-            window.spinGameWheel = function(){
-                const wheel = document.getElementById("gameWheel");
-                const angle = Math.random()*360 + 1440;
-                wheel.style.transition = "transform 4s ease-out";
-                wheel.style.transform = `rotate(${angle}deg)`;
-                setTimeout(()=>{
-                    const result = truthDare[Math.floor(Math.random()*truthDare.length)];
-                    document.getElementById("game-result").innerText = result;
-                },4000);
-            }
-            window.feedPet = function(){petHappiness = Math.min(100, petHappiness + 25);petExp += 10;checkLevelUp();showDogBubble("🍖 好好吃！谢谢姐姐/哥哥～");updatePetStatus();}
-            window.playWithPet = function(){petHappiness = Math.min(100, petHappiness + 15);petExp += 8;checkLevelUp();showDogBubble("🎾 太好玩啦！再玩一次～");updatePetStatus();}
-            window.sendMessage = function(){
-                const text = document.getElementById("message-input").value.trim();
-                if(!text) return;
-                const now = new Date();
-                const time = now.toLocaleString();
-                messages.unshift({text, time});
-                localStorage.setItem("messages", JSON.stringify(messages));
-                alert("✅ 留言发送成功！");location.reload();
-            }
-            window.setMood = function(mood){
-                if(canMood){
-                    todayMood = mood;lastMoodDate = today;
-                    localStorage.setItem("todayMood", todayMood);localStorage.setItem("lastMoodDate", lastMoodDate);
-                    alert("✅ 心情打卡成功！");location.reload();
-                }
-            }
-            window.createCapsule = function(){
-                const content = document.getElementById("capsule-content").value.trim();
-                const openDate = document.getElementById("capsule-date").value;
-                if(!content || !openDate){alert("请填写信件内容和打开日期！");return;}
-                const now = new Date();
-                const createTime = now.toLocaleString();
-                capsules.unshift({content,openDate,createTime,title:`写给 ${openDate} 的信`});
-                localStorage.setItem("loveCapsules", JSON.stringify(capsules));
-                alert("✅ 时间胶囊封存成功！到了那天就能打开啦～");location.reload();
-            }
-            window.openCapsule = function(index){
-                const contentDiv = document.getElementById(`capsule-content-${index}`);
-                contentDiv.style.display = contentDiv.style.display === "none" ? "block" : "none";
-                contentDiv.innerText = capsules[index].content;
-            }
-            document.getElementById("period-date").onchange = (e)=>{
-                lastPeriod = e.target.value;
-                localStorage.setItem("lastPeriod",lastPeriod);
-                alert("✅ 生理期已更新");location.reload();
-            }
-            initSuperPet();
-        },3000);
+        // 记住登录状态
+        localStorage.setItem("isLogin", "ok");
+        renderMain();
     }else{
         alert("密码不对～只有黄帝大人才能进来哦");
     }
 }
+
+// ✅ 自动登录（登录过一次就不用再输密码）
+window.onload = function(){
+    if(localStorage.getItem("isLogin") === "ok"){
+        renderMain();
+    }
+}
+
+function renderMain(){
+    const now = new Date();
+    const t = getTogetherTime();
+    
+    // 生日自动跨年计算
+    let birthSisterLeft = Math.ceil((birthdaySister - now) / (1000*60*60*24));
+    if(birthSisterLeft < 0) birthSisterLeft += 365;
+    let birthMeLeft = Math.ceil((birthdayMe - now) / (1000*60*60*24));
+    if(birthMeLeft < 0) birthMeLeft += 365;
+    
+    const periodInfo = getPeriodTips();
+    const randomWord = loveWords[Math.floor(Math.random()*loveWords.length)];
+    const todayLuck = luckList[Math.floor(Math.random()*luckList.length)];
+    const today = now.toDateString();
+    const canLove = today !== lastLoveDate;
+    const canMood = today !== lastMoodDate;
+
+    document.getElementById('page').innerHTML = `
+    <div class="content">
+        <h1 class="couple-name">小韩 ❤️ 漂亮姐姐 黄雨辰</h1>
+        <p class="love-day">我们已经相爱 ${t.years}年${t.months}月${t.days}天</p>
+        <p class="memo">我们在一起已经 ${t.totalDays} 天啦</p>
+        <div class="memo typewriter" id="loveLetter"></div>
+
+        <div class="date-box">
+            <p class="date-title">💌 我们的专属纪念日</p>
+            <p class="memo">和姐姐正式开始：2026.05.21</p>
+            <p class="memo">姐姐生日(06.06)：还有 ${birthSisterLeft} 天</p>
+            <p class="memo">我的生日(03.29)：还有 ${birthMeLeft} 天</p>
+        </div>
+
+        <div class="period-box">
+            <p class="date-title">🩸 姐姐生理期记录</p>
+            <p class="memo">距离下次生理期：${periodInfo.nextDays} 天</p>
+            <p class="memo" style="color:${periodInfo.color};font-weight:bold">${periodInfo.status}</p>
+            <input class="period-input" type="date" id="period-date" value="${lastPeriod}">
+            <p class="memo" style="font-size:14px;margin-top:8px">姐姐可自己更新生理期日期</p>
+        </div>
+
+        <div class="fun-box">
+            <p class="date-title">✨ 情侣小乐园</p>
+            <p class="memo">今日情话：${randomWord}</p>
+            <p class="memo">今日运势：${todayLuck}</p>
+            <p class="memo">我已经想姐姐 <span id="miss-num">${missCount}</span> 次啦</p>
+            <p class="memo">连续说我爱你：${loveDays} 天</p>
+            <p class="memo">今日心情：${todayMood || "还没打卡"}</p>
+            <button class="btn" onclick="addMiss()">💓 又想姐姐了 +1</button>
+            <button class="btn" onclick="refreshWord()">💌 换一句情话</button>
+            <button class="btn" onclick="sayLove()" ${!canLove?"disabled":""}>💕 今日说我爱你</button>
+            <button class="btn" onclick="feedPet()">🍖 喂小狗吃东西</button>
+            <button class="btn" onclick="playWithPet()">🎾 陪小狗玩</button>
+        </div>
+
+        <div class="capsule-box">
+            <p class="date-title">💌 爱情时间胶囊</p>
+            <p class="memo">给未来的对方写一封信，到指定日期才能打开</p>
+            <textarea class="capsule-input" id="capsule-content" placeholder="写下你想对未来的TA说的话..."></textarea>
+            <input type="date" class="capsule-date" id="capsule-date" min="${new Date().toISOString().split('T')[0]}">
+            <button class="btn" onclick="createCapsule()">🔒 封存时间胶囊</button>
+            <div id="capsule-list"></div>
+        </div>
+
+        <div class="luck-box">
+            <p class="date-title">🎡 爱情幸运转盘</p>
+            <div class="wheel" id="luckWheel">
+                <div class="wheel-sector" style="transform:rotate(0deg);background:#ffb6c1"><div class="wheel-text">火锅</div></div>
+                <div class="wheel-sector" style="transform:rotate(45deg);background:#ffc0cb"><div class="wheel-text">烧烤</div></div>
+                <div class="wheel-sector" style="transform:rotate(90deg);background:#ffb6c1"><div class="wheel-text">奶茶</div></div>
+                <div class="wheel-sector" style="transform:rotate(135deg);background:#ffc0cb"><div class="wheel-text">炸鸡</div></div>
+                <div class="wheel-sector" style="transform:rotate(180deg);background:#ffb6c1"><div class="wheel-text">披萨</div></div>
+                <div class="wheel-sector" style="transform:rotate(225deg);background:#ffc0cb"><div class="wheel-text">螺蛳粉</div></div>
+                <div class="wheel-sector" style="transform:rotate(270deg);background:#ffb6c1"><div class="wheel-text">日料</div></div>
+                <div class="wheel-sector" style="transform:rotate(315deg);background:#ffc0cb"><div class="wheel-text">甜品</div></div>
+            </div>
+            <button class="btn" onclick="spinLuckWheel()">🎲 帮我决定吃什么</button>
+            <p id="luck-result" class="memo" style="margin-top:15px;font-weight:bold"></p>
+        </div>
+
+        <div class="wish-box">
+            <p class="date-title">📝 我们的心愿清单</p>
+            <div id="wish-list"></div>
+        </div>
+
+        <div class="message-box">
+            <p class="date-title">💬 私密留言板</p>
+            <textarea class="message-input" id="message-input" placeholder="给对方留一句悄悄话..."></textarea>
+            <button class="btn" onclick="sendMessage()">发送留言</button>
+            <div id="message-list"></div>
+        </div>
+
+        <div class="game-box">
+            <p class="date-title">🎮 真心话大冒险</p>
+            <div class="wheel" id="gameWheel">
+                <div class="wheel-sector" style="transform:rotate(0deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
+                <div class="wheel-sector" style="transform:rotate(45deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
+                <div class="wheel-sector" style="transform:rotate(90deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
+                <div class="wheel-sector" style="transform:rotate(135deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
+                <div class="wheel-sector" style="transform:rotate(180deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
+                <div class="wheel-sector" style="transform:rotate(225deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
+                <div class="wheel-sector" style="transform:rotate(270deg);background:#ffb6c1"><div class="wheel-text">真心话</div></div>
+                <div class="wheel-sector" style="transform:rotate(315deg);background:#ffc0cb"><div class="wheel-text">大冒险</div></div>
+            </div>
+            <button class="btn" onclick="spinGameWheel()">🎲 开始转动</button>
+            <p id="game-result" class="memo" style="margin-top:15px;font-weight:bold"></p>
+        </div>
+
+        <div class="fun-box">
+            <p class="date-title">😊 每日心情打卡</p>
+            <div class="mood-buttons">
+                <button class="mood-btn" onclick="setMood('😊')" ${!canMood?"disabled":""}>😊</button>
+                <button class="mood-btn" onclick="setMood('😃')" ${!canMood?"disabled":""}>😃</button>
+                <button class="mood-btn" onclick="setMood('😢')" ${!canMood?"disabled":""}>😢</button>
+                <button class="mood-btn" onclick="setMood('😠')" ${!canMood?"disabled":""}>😠</button>
+                <button class="mood-btn" onclick="setMood('🥰')" ${!canMood?"disabled":""}>🥰</button>
+            </div>
+            <p class="memo" style="font-size:14px">每天只能打卡一次哦</p>
+        </div>
+    </div>`;
+
+    // 渲染列表
+    const wishList = document.getElementById("wish-list");
+    wishList.innerHTML = "";
+    wishes.forEach((wish,index)=>{
+        wishList.innerHTML += `
+        <div class="wish-item">
+            <input type="checkbox" id="wish-${index}" ${wish.done?"checked":""} onchange="toggleWish(${index})">
+            <label for="wish-${index}">${wish.text}</label>
+        </div>`;
+    });
+    
+    const messageList = document.getElementById("message-list");
+    messageList.innerHTML = "";
+    messages.forEach(msg=>{
+        messageList.innerHTML += `<div class="message-item"><p>${msg.text}</p><p class="message-time">${msg.time}</p></div>`;
+    });
+    
+    const capsuleList = document.getElementById("capsule-list");
+    capsuleList.innerHTML = "";
+    capsules.forEach((capsule,index)=>{
+        const openDate = new Date(capsule.openDate);
+        const now = new Date();
+        const canOpen = now >= openDate;
+        const daysLeft = Math.ceil((openDate - now) / (1000*60*60*24));
+        capsuleList.innerHTML += `
+        <div class="capsule-item">
+            <div class="capsule-title">${capsule.title || "给未来的信"}</div>
+            <div class="capsule-time">封存时间：${capsule.createTime} | 打开时间：${capsule.openDate}</div>
+            ${canOpen ? `<button class="btn" onclick="openCapsule(${index})">📩 打开胶囊</button><div id="capsule-content-${index}" style="display:none;margin-top:10px" class="capsule-content"></div>` : `<p class="memo" style="margin-top:10px">⏳ 还有 ${daysLeft} 天才能打开</p>`}
+        </div>`;
+    });
+    
+    // 初始化打字机和宠物
+    typeWriter(loveLetter, "loveLetter", 80);
+    initSuperPet();
+}
+
+// 全局函数
+window.addMiss = ()=>{missCount++;localStorage.setItem("missCount",missCount);document.getElementById("miss-num").innerText = missCount;};
+window.refreshWord = ()=>{const w=loveWords[Math.floor(Math.random()*loveWords.length)];document.querySelector(".fun-box .memo:nth-child(2)").innerText="今日情话："+w;};
+window.sayLove = ()=>{
+    const today=new Date().toDateString();
+    if(today!==lastLoveDate){
+        loveDays++;lastLoveDate=today;
+        localStorage.setItem("loveDays",loveDays);localStorage.setItem("lastLoveDate",lastLoveDate);
+        alert("❤️ 我爱你！今天的爱意已收到～");
+        renderMain();
+    }
+};
+window.toggleWish = (i)=>{wishes[i].done=!wishes[i].done;localStorage.setItem("wishes",JSON.stringify(wishes));};
+window.spinLuckWheel = ()=>{
+    const w=document.getElementById("luckWheel");
+    const a=Math.random()*360+1440;
+    w.style.transition="transform 4s ease-out";
+    w.style.transform=`rotate(${a}deg)`;
+    setTimeout(()=>{document.getElementById("luck-result").innerText="今天就吃："+luckOptions[Math.floor(Math.random()*luckOptions.length)];},4000);
+};
+window.spinGameWheel = ()=>{
+    const w=document.getElementById("gameWheel");
+    const a=Math.random()*360+1440;
+    w.style.transition="transform 4s ease-out";
+    w.style.transform=`rotate(${a}deg)`;
+    setTimeout(()=>{document.getElementById("game-result").innerText=truthDare[Math.floor(Math.random()*truthDare.length)];},4000);
+};
+window.feedPet = ()=>{petHappiness=Math.min(100,petHappiness+25);petExp+=10;checkLevelUp();showDogBubble("🍖 谢谢姐姐～");updatePetStatus();};
+window.playWithPet = ()=>{petHappiness=Math.min(100,petHappiness+15);petExp+=8;checkLevelUp();showDogBubble("🎾 好开心！");updatePetStatus();};
+window.sendMessage = ()=>{
+    const t=document.getElementById("message-input").value.trim();
+    if(!t)return;
+    const now=new Date();
+    messages.unshift({text:t,time:now.toLocaleString()});
+    localStorage.setItem("messages",JSON.stringify(messages));
+    renderMain();
+};
+window.setMood = (m)=>{
+    const today=new Date().toDateString();
+    if(today!==lastMoodDate){
+        todayMood=m;lastMoodDate=today;
+        localStorage.setItem("todayMood",todayMood);localStorage.setItem("lastMoodDate",lastMoodDate);
+        alert("✅ 心情打卡成功！");
+        renderMain();
+    }
+};
+window.createCapsule = ()=>{
+    const c=document.getElementById("capsule-content").value.trim();
+    const d=document.getElementById("capsule-date").value;
+    if(!c||!d){alert("请填写信件内容和打开日期！");return;}
+    capsules.unshift({content:c,openDate:d,createTime:new Date().toLocaleString(),title:`写给${d}的信`});
+    localStorage.setItem("loveCapsules",JSON.stringify(capsules));
+    alert("✅ 时间胶囊封存成功！到了那天就能打开啦～");
+    renderMain();
+};
+window.openCapsule = (i)=>{
+    const el=document.getElementById("capsule-content-"+i);
+    el.style.display=el.style.display==="none"?"block":"none";
+    el.innerText=capsules[i].content;
+};
+document.addEventListener("change", (e)=>{
+    if(e.target.id === "period-date"){
+        lastPeriod = e.target.value;
+        localStorage.setItem("lastPeriod",lastPeriod);
+        alert("✅ 生理期已更新");
+        renderMain();
+    }
+});
 </script>
 </body>
 </html>
