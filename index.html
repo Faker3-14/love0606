@@ -28,6 +28,27 @@
             padding:12px 24px;border-radius:16px;font-size:16px;cursor:pointer
         }
 
+        /* ========== 三秒心动加载动画 ========== */
+        .heart-page{
+            min-height:100vh;
+            background:#fce7f3;
+            display:flex;align-items:center;justify-content:center;
+            position:fixed;top:0;left:0;width:100%;z-index:9999;
+            animation:fadeOut 0.5s ease 3s forwards;
+        }
+        .heart{
+            font-size:140px;color:#f43f5e;
+            animation:beat 0.6s infinite;
+        }
+        @keyframes beat{
+            0%,100%{transform:scale(1)}
+            50%{transform:scale(1.2)}
+        }
+        @keyframes fadeOut{
+            0%{opacity:1;visibility:visible}
+            100%{opacity:0;visibility:hidden}
+        }
+
         .content{
             min-height:100vh;
             background:linear-gradient(#fbcfe8,#fff);
@@ -370,13 +391,23 @@ function typeWriter(text, elementId, speed=50){
     type();
 }
 
-// ✅ 修复登录逻辑，直接秒进，无卡顿
+// ✅ 完美三秒心动：CSS动画控制，绝对不卡顿
 function check(){
     let val = document.getElementById('pwd').value.trim();
     if(val === correct){
         // 记住登录状态
         localStorage.setItem("isLogin", "ok");
-        renderMain();
+        
+        // 显示三秒心动加载动画
+        document.getElementById('page').innerHTML = `
+        <div class="heart-page" id="heartPage">
+            <div class="heart">❤️</div>
+        </div>`;
+        
+        // 动画结束后自动渲染主页面
+        document.getElementById('heartPage').addEventListener('animationend', function(){
+            renderMain();
+        });
     }else{
         alert("密码不对～只有黄帝大人才能进来哦");
     }
@@ -385,7 +416,15 @@ function check(){
 // ✅ 自动登录（登录过一次就不用再输密码）
 window.onload = function(){
     if(localStorage.getItem("isLogin") === "ok"){
-        renderMain();
+        // 自动登录也显示三秒心动
+        document.getElementById('page').innerHTML = `
+        <div class="heart-page" id="heartPage">
+            <div class="heart">❤️</div>
+        </div>`;
+        
+        document.getElementById('heartPage').addEventListener('animationend', function(){
+            renderMain();
+        });
     }
 }
 
