@@ -191,12 +191,13 @@
 
 <script>
 const correct = "0329";
-// ✅ 已修改：在一起起始日期为2025年5月21日
-const togetherStart = new Date("2025-05-21");
+// ✅ 已修正：在一起起始日期为2026年5月21日
+const togetherStart = new Date("2026-05-21");
+// 生日自动按当前年份计算，过了自动算下一年
 const birthdaySister = new Date(new Date().getFullYear()+"-06-06");
 const birthdayMe = new Date(new Date().getFullYear()+"-03-29");
 
-let lastPeriod = localStorage.getItem("lastPeriod") || "2025-05-06";
+let lastPeriod = localStorage.getItem("lastPeriod") || "2026-05-06";
 const cycle = 28;
 let missCount = Number(localStorage.getItem("missCount")) || 0;
 let loveDays = Number(localStorage.getItem("loveDays")) || 0;
@@ -236,8 +237,9 @@ const luckList = ["💖 甜蜜模式：今天适合黏着姐姐撒娇","🥰 宠
 const truthDare = ["真心话：你最喜欢我哪一点？","大冒险：亲对方一下","真心话：你第一次见我是什么感觉？","大冒险：说一句最肉麻的情话","真心话：你想我了吗？","大冒险：抱对方10秒钟","真心话：你觉得我哪里最可爱？","大冒险：给对方唱首歌"];
 // 美食选项
 const luckOptions = ["火锅","烧烤","奶茶","炸鸡","披萨","螺蛳粉","日料","甜品"];
-const loveLetter = "亲爱的姐姐：\n从遇见你的那一刻起，我的世界就变得不一样了。\n我笨手笨脚总让你不开心。谢谢你包容我的不成熟，我会慢慢变成配得上你的人，以后你哪里不开心了，一定要告诉我，别自己憋着。我想知道，也想改，更想让你每天都开心。\n爱你的笨蛋弟弟";
+const loveLetter = "亲爱的姐姐：\n从遇见你的那一刻起，我的世界就变得不一样了。\n你是我的温柔，是我的偏爱，是我的唯一。\n爱你的小韩";
 
+// ✅ 精确天数计算：当天算第1天，每天自动+1
 function getTogetherTime(){
     const now = new Date();
     let start = new Date(togetherStart);
@@ -248,10 +250,11 @@ function getTogetherTime(){
     while (new Date(start.getFullYear(), start.getMonth()+1, start.getDate()) <= now) {
         months++; start.setMonth(start.getMonth()+1);
     }
-    days = Math.floor((now - start) / (1000*60*60*24)) + 1; // 当天算第1天
-    const totalDays = Math.max(0, Math.floor((now - togetherStart) / (1000*60*60*24)) + 1);
+    days = Math.floor((now - start) / (1000*60*60*24)) + 1;
+    const totalDays = Math.max(0, Math.floor((now - togetherStart) / (1000*60*60*24)) + 1;
     return {years,months,days,totalDays};
 }
+// ✅ 生理期自动计算下次日期和状态
 function getPeriodTips(){
     const last = new Date(lastPeriod);
     const now = new Date();
@@ -365,6 +368,7 @@ function check(){
         setTimeout(()=>{
             const now = new Date();
             const t = getTogetherTime();
+            // ✅ 生日自动倒计时：过了今年自动算下一年
             let birthSisterLeft = Math.ceil((birthdaySister - now) / (1000*60*60*24));
             if(birthSisterLeft < 0) birthSisterLeft += 365;
             let birthMeLeft = Math.ceil((birthdayMe - now) / (1000*60*60*24));
@@ -385,7 +389,7 @@ function check(){
 
                 <div class="date-box">
                     <p class="date-title">💌 我们的专属纪念日</p>
-                    <p class="memo">和姐姐正式开始：2025.05.21</p>
+                    <p class="memo">和姐姐正式开始：2026.05.21</p>
                     <p class="memo">姐姐生日(06.06)：还有 ${birthSisterLeft} 天</p>
                     <p class="memo">我的生日(03.29)：还有 ${birthMeLeft} 天</p>
                 </div>
