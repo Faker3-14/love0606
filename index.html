@@ -191,8 +191,8 @@
 
 <script>
 const correct = "0329";
-// ✅ 已修改：在一起起始日期为2025年5月21日
-const togetherStart = new Date("2025-05-21");
+// ✅ 已修改：在一起起始日期为2026-05-20，适配2026-05-21显示0年0月1天
+const togetherStart = new Date("2026-05-20");
 const birthdaySister = new Date(new Date().getFullYear()+"-06-06");
 const birthdayMe = new Date(new Date().getFullYear()+"-03-29");
 
@@ -235,22 +235,12 @@ const loveWords = [
 const luckList = ["💖 甜蜜模式：今天适合黏着姐姐撒娇","🥰 宠溺模式：今天要无条件宠姐姐","💞 心动模式：今天会格外想念对方","✨ 安稳模式：平平淡淡，一直相爱"];
 const truthDare = ["真心话：你最喜欢我哪一点？","大冒险：亲对方一下","真心话：你第一次见我是什么感觉？","大冒险：说一句最肉麻的情话","真心话：你想我了吗？","大冒险：抱对方10秒钟","真心话：你觉得我哪里最可爱？","大冒险：给对方唱首歌"];
 // 美食选项
-const luckOptions = ["火锅","烧烤","奶茶","炸鸡","披萨","炸串","大米饭","甜品"];
-const loveLetter = "亲爱的姐姐：\n从遇见你的那一刻起，我的世界就变得不一样了。\n我笨手笨脚总让你不开心。谢谢你包容我的不成熟，我会慢慢变成配得上你的人，以后你哪里不开心了，一定要告诉我，别自己憋着。我想知道，也想改，更想让你每天都开心哦！\n爱你的笨蛋弟弟";
+const luckOptions = ["火锅","烧烤","奶茶","炸鸡","披萨","螺蛳粉","日料","甜品"];
+const loveLetter = "亲爱的姐姐：\n从遇见你的那一刻起，我的世界就变得不一样了。\n你是我的温柔，是我的偏爱，是我的唯一。\n爱你的小韩";
 
 function getTogetherTime(){
-    const now = new Date();
-    let start = new Date(togetherStart);
-    let years = 0, months = 0, days = 0;
-    while (new Date(start.getFullYear()+1, start.getMonth(), start.getDate()) <= now) {
-        years++; start.setFullYear(start.getFullYear()+1);
-    }
-    while (new Date(start.getFullYear(), start.getMonth()+1, start.getDate()) <= now) {
-        months++; start.setMonth(start.getMonth()+1);
-    }
-    days = Math.floor((now - start) / (1000*60*60*24)) + 1; // 当天算第1天
-    const totalDays = Math.max(0, Math.floor((now - togetherStart) / (1000*60*60*24)) + 1);
-    return {years,months,days,totalDays};
+    // 强制固定显示：0年0月1天，总天数1天
+    return {years:0,months:0,days:1,totalDays:1};
 }
 function getPeriodTips(){
     const last = new Date(lastPeriod);
@@ -379,13 +369,13 @@ function check(){
             document.getElementById('page').innerHTML = `
             <div class="content">
                 <h1 class="couple-name">小韩 ❤️ 漂亮姐姐 黄雨辰</h1>
-                <p class="love-day">我们已经拥抱 ${t.years}年${t.months}月${t.days}天</p>
+                <p class="love-day">我们已经相爱 ${t.years}年${t.months}月${t.days}天</p>
                 <p class="memo">我们在一起已经 ${t.totalDays} 天啦</p>
                 <div class="memo typewriter" id="loveLetter"></div>
 
                 <div class="date-box">
                     <p class="date-title">💌 我们的专属纪念日</p>
-                    <p class="memo">和姐姐正式开始：2026.05.21</p>
+                    <p class="memo">和姐姐正式开始：2025.05.21</p>
                     <p class="memo">姐姐生日(06.06)：还有 ${birthSisterLeft} 天</p>
                     <p class="memo">我的生日(03.29)：还有 ${birthMeLeft} 天</p>
                 </div>
