@@ -238,9 +238,8 @@ let petY = Math.random()*60 + 20;
 let isDancing = false;
 let longPressTimer = null;
 
-// 强制清空缓存，修复卡死问题
-localStorage.removeItem("loveCities");
-let loveCities = [];
+// 读取本地保存的城市，默认空，**不再强制清空**
+let loveCities = JSON.parse(localStorage.getItem("loveCities")) || [];
 
 const cityCoord = {
     "北京":[116.40,39.90],"上海":[121.47,31.23],"天津":[117.20,39.13],"重庆":[106.55,29.56],
