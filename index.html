@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>❤️ is黄黄 & Han仔 专属秘密 ❤️</title>
+    <!-- 微信兼容：先不加载china地图，延迟加载 -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
         body{margin:0;overflow-x:hidden}
@@ -86,7 +86,6 @@
             transform:rotate(45deg);font-size:12px;font-weight:bold;
         }
 
-        /* ========== 修复：每日心情按钮样式（就是这里缺了！） ========== */
         .mood-btn {
             font-size: 28px;
             margin: 6px;
@@ -253,7 +252,6 @@ let petY = Math.random()*60 + 20;
 let isDancing = false;
 let longPressTimer = null;
 
-// 读取本地保存的城市，默认空，**不再强制清空**
 let loveCities = JSON.parse(localStorage.getItem("loveCities")) || [];
 
 const cityCoord = {
@@ -470,33 +468,40 @@ function typeWriter(text, elementId, speed=50){
     type();
 }
 
+// 微信兼容：地图JS动态加载，失败不阻塞页面
 function initLoveMap(){
-    const myChart = echarts.init(document.getElementById("loveMap"));
-    const pointData = loveCities.map(c=>{
-        return {name:c.name,value:[c.lng,c.lat]};
-    });
-    const lineData = [];
-    for(let i=0;i<loveCities.length-1;i++){
-        lineData.push([
-            [loveCities[i].lng, loveCities[i].lat],
-            [loveCities[i+1].lng, loveCities[i+1].lat]
-        ]);
-    }
-    const option = {
-        tooltip:{trigger:"item"},
-        geo:{
-            map:"china",roam:false,zoom:1.2,
-            itemStyle:{areaColor:"#fce7f3",borderColor:"#f43f5e"},
-            emphasis:{itemStyle:{areaColor:"#fbcfe8"}}
-        },
-        series:[
-            {type:"lines",data:lineData,lineStyle:{color:"#f43f5e",width:2,curveness:0.2}},
-            {type:"scatter",coordinateSystem:"geo",symbolSize:12,data:pointData,
-                itemStyle:{color:"#f43f5e"},label:{show:true,formatter:"{b}"}
-            }
-        ]
+    const script = document.createElement('script');
+    script.src = "https://cdn.jsdelivr.net/npm/echarts/map/js/china.js";
+    script.onload = ()=>{
+        const myChart = echarts.init(document.getElementById("loveMap"));
+        const pointData = loveCities.map(c=>{
+            return {name:c.name,value:[c.lng,c.lat]};
+        });
+        const lineData = [];
+        for(let i=0;i<loveCities.length-1;i++){
+            lineData.push([
+                [loveCities[i].lng, loveCities[i].lat],
+                [loveCities[i+1].lng, loveCities[i+1].lat]
+            ]);
+        }
+        const option = {
+            tooltip:{trigger:"item"},
+            geo:{
+                map:"china",roam:false,zoom:1.2,
+                itemStyle:{areaColor:"#fce7f3",borderColor:"#f43f5e"},
+                emphasis:{itemStyle:{areaColor:"#fbcfe8"}}
+            },
+            series:[
+                {type:"lines",data:lineData,lineStyle:{color:"#f43f5e",width:2,curveness:0.2}},
+                {type:"scatter",coordinateSystem:"geo",symbolSize:12,data:pointData,
+                    itemStyle:{color:"#f43f5e"},label:{show:true,formatter:"{b}"}
+                }
+            ]
+        };
+        myChart.setOption(option);
     };
-    myChart.setOption(option);
+    script.onerror = ()=>{};
+    document.head.appendChild(script);
 }
 function addLoveCity(){
     const cityName = document.getElementById("cityInput").value.trim();
@@ -517,6 +522,7 @@ function check(){
     let val = document.getElementById('pwd').value;
     if(val === correct){
         document.getElementById('page').innerHTML = `<div class="heart-page"><div class="heart">❤️</div></div>`;
+        // 微信兼容：缩短延迟，2秒进入，避免挂起
         setTimeout(()=>{
             const now = new Date();
             const t = getTogetherTime();
@@ -741,7 +747,7 @@ function check(){
                 alert("✅ 生理期已更新");location.reload();
             }
             initSuperPet();
-        },3000);
+        },2000); // 微信缩短到2秒，避免卡死
     }else{
         alert("密码不对～只有黄帝大人才能进来哦");
     }
