@@ -241,10 +241,7 @@ let isDancing = false;
 let longPressTimer = null;
 
 // 新增：恋爱地图城市数据（坐标+城市名，可直接扩展）
-let loveCities = JSON.parse(localStorage.getItem("loveCities")) || [
-    {name:"北京",lng:116.40,lat:39.90,time:""},
-    {name:"厦门",lng:118.10,lat:24.46,time:""}
-];
+let loveCities = JSON.parse(localStorage.getItem("loveCities")) || [];
 
 // ==============================================
 // 已扩充：全国所有地级市 + 热门旅游城市 + 县级市
