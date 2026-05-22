@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>❤️ is黄黄 & Han仔 专属秘密 ❤️</title>
-    <!-- 新增：ECharts 中国地图 -->
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
     <style>
@@ -210,7 +209,6 @@
 
 <script>
 const correct = "0329";
-// 正式在一起日期：2026年5月21日
 const togetherStart = new Date("2026-05-21");
 const birthdaySister = new Date("2026-06-06");
 const birthdayMe = new Date("2026-03-29");
@@ -240,13 +238,10 @@ let petY = Math.random()*60 + 20;
 let isDancing = false;
 let longPressTimer = null;
 
-// 新增：恋爱地图城市数据（坐标+城市名，可直接扩展）
-let loveCities = JSON.parse(localStorage.getItem("loveCities")) || [];
+// 强制清空缓存，修复卡死问题
+localStorage.removeItem("loveCities");
+let loveCities = [];
 
-// ==============================================
-// 已扩充：全国所有地级市 + 热门旅游城市 + 县级市
-// 几乎国内任何城市都能直接输入点亮！
-// ==============================================
 const cityCoord = {
     "北京":[116.40,39.90],"上海":[121.47,31.23],"天津":[117.20,39.13],"重庆":[106.55,29.56],
     "石家庄":[114.48,38.03],"唐山":[118.18,39.63],"秦皇岛":[119.60,39.93],"邯郸":[114.47,36.62],
@@ -338,7 +333,6 @@ const loveWords = [
 ];
 const luckList = ["💖 甜蜜模式：今天适合黏着姐姐撒娇","🥰 宠溺模式：今天要无条件宠姐姐","💞 心动模式：今天会格外想念对方","✨ 安稳模式：平平淡淡，一直相爱"];
 const truthDare = ["真心话：你最喜欢我哪一点？","大冒险：亲对方一下","真心话：你第一次见我是什么感觉？","大冒险：说一句最肉麻的情话","真心话：你想我了吗？","大冒险：抱对方10秒钟","真心话：你觉得我哪里最可爱？","大冒险：给对方唱首歌"];
-// 美食选项
 const luckOptions = ["火锅","烧烤","奶茶","炸鸡","披萨","螺蛳粉","日料","甜品"];
 const loveLetter = "亲爱的姐姐：\n从遇见你的那一刻起，我的世界就变得不一样了。\n我笨手笨脚总让你不开心。谢谢你包容我的不成熟，我会努力变成配得上你的人，以后你哪里不开心了，一定要告诉我，别自己承受，我们一起承担，我想知道，也想改，更想让你每天都开心！\n爱你的笨蛋弟弟";
 
@@ -462,14 +456,11 @@ function typeWriter(text, elementId, speed=50){
     type();
 }
 
-// 新增：初始化恋爱地图
 function initLoveMap(){
     const myChart = echarts.init(document.getElementById("loveMap"));
-    // 地图标记点
     const pointData = loveCities.map(c=>{
         return {name:c.name,value:[c.lng,c.lat]};
     });
-    // 轨迹连线数据（按顺序连线）
     const lineData = [];
     for(let i=0;i<loveCities.length-1;i++){
         lineData.push([
@@ -493,7 +484,6 @@ function initLoveMap(){
     };
     myChart.setOption(option);
 }
-// 新增：添加城市到恋爱地图
 function addLoveCity(){
     const cityName = document.getElementById("cityInput").value.trim();
     if(!cityName){alert("请输入城市名");return;}
@@ -503,7 +493,6 @@ function addLoveCity(){
     localStorage.setItem("loveCities",JSON.stringify(loveCities));
     alert("✅ 城市已点亮！");location.reload();
 }
-// 新增：清空所有城市
 function clearLoveCities(){
     if(confirm("确定清空所有恋爱足迹？")){
         loveCities = [];localStorage.setItem("loveCities","");location.reload();
@@ -629,7 +618,6 @@ function check(){
                     <p class="memo" style="font-size:14px">每天只能打卡一次哦</p>
                 </div>
 
-                <!-- 新增：恋爱地图模块 -->
                 <div class="map-box">
                     <p class="date-title">🗺️ 恋爱地图 · 我们走过的地方</p>
                     <div id="loveMap"></div>
@@ -668,7 +656,6 @@ function check(){
                 </div>`;
             });
             typeWriter(loveLetter, "loveLetter", 80);
-            // 初始化恋爱地图
             initLoveMap();
 
             window.addMiss = function(){missCount++;localStorage.setItem("missCount",missCount);document.getElementById("miss-num").innerText = missCount;}
