@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>❤️ is黄黄 & Han仔 专属秘密 ❤️</title>
+    <!-- 新增：ECharts 中国地图 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts/map/js/china.js"></script>
     <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
         body{margin:0;overflow-x:hidden}
@@ -176,6 +179,22 @@
         .capsule-content{
             white-space:pre-wrap;line-height:1.6;
         }
+
+        /* ========== 新增：恋爱地图样式 ========== */
+        .map-box{
+            margin-top:30px;padding:24px;
+            background:rgba(255,255,255,0.75);border-radius:18px;
+        }
+        #loveMap{
+            width:100%;height:420px;border-radius:12px;margin:15px 0;
+            background:#fff;
+        }
+        .map-input{
+            width:70%;padding:10px;border-radius:10px;border:1px solid #ddd;margin-right:8px;
+        }
+        .city-item{
+            display:inline-block;background:#fce7f3;padding:6px 12px;border-radius:12px;margin:6px;font-size:14px;
+        }
     </style>
 </head>
 <body>
@@ -220,6 +239,18 @@ let petX = Math.random()*80 + 10;
 let petY = Math.random()*60 + 20;
 let isDancing = false;
 let longPressTimer = null;
+
+// 新增：恋爱地图城市数据（坐标+城市名，可直接扩展）
+let loveCities = JSON.parse(localStorage.getItem("loveCities")) || [
+    {name:"北京",lng:116.40,lat:39.90,time:""},
+    {name:"厦门",lng:118.10,lat:24.46,time:""}
+];
+// 常用城市经纬度快捷库
+const cityCoord = {
+    "北京":[116.40,39.90],"上海":[121.47,31.23],"广州":[113.27,23.13],"深圳":[114.07,22.62],
+    "杭州":[120.15,30.28],"南京":[118.78,32.04],"成都":[104.07,30.67],"重庆":[106.55,29.56],
+    "西安":[108.95,34.27],"厦门":[118.10,24.46],"青岛":[120.38,36.07],"长沙":[112.93,28.23]
+};
 
 const dogWords = [
     "姐姐好漂亮呀～","小韩哥哥最帅了！","汪汪汪！想你们啦","要抱抱要亲亲～",
@@ -358,6 +389,54 @@ function typeWriter(text, elementId, speed=50){
     type();
 }
 
+// 新增：初始化恋爱地图
+function initLoveMap(){
+    const myChart = echarts.init(document.getElementById("loveMap"));
+    // 地图标记点
+    const pointData = loveCities.map(c=>{
+        return {name:c.name,value:[c.lng,c.lat]};
+    });
+    // 轨迹连线数据（按顺序连线）
+    const lineData = [];
+    for(let i=0;i<loveCities.length-1;i++){
+        lineData.push([
+            [loveCities[i].lng, loveCities[i].lat],
+            [loveCities[i+1].lng, loveCities[i+1].lat]
+        ]);
+    }
+    const option = {
+        tooltip:{trigger:"item"},
+        geo:{
+            map:"china",roam:false,zoom:1.2,
+            itemStyle:{areaColor:"#fce7f3",borderColor:"#f43f5e"},
+            emphasis:{itemStyle:{areaColor:"#fbcfe8"}}
+        },
+        series:[
+            {type:"lines",data:lineData,lineStyle:{color:"#f43f5e",width:2,curveness:0.2}},
+            {type:"scatter",coordinateSystem:"geo",symbolSize:12,data:pointData,
+                itemStyle:{color:"#f43f5e"},label:{show:true,formatter:"{b}"}
+            }
+        ]
+    };
+    myChart.setOption(option);
+}
+// 新增：添加城市到恋爱地图
+function addLoveCity(){
+    const cityName = document.getElementById("cityInput").value.trim();
+    if(!cityName){alert("请输入城市名");return;}
+    if(!cityCoord[cityName]){alert("暂不支持该城市，可联系添加坐标");return;}
+    const [lng,lat] = cityCoord[cityName];
+    loveCities.push({name:cityName,lng,lat,time:new Date().toLocaleString()});
+    localStorage.setItem("loveCities",JSON.stringify(loveCities));
+    alert("✅ 城市已点亮！");location.reload();
+}
+// 新增：清空所有城市
+function clearLoveCities(){
+    if(confirm("确定清空所有恋爱足迹？")){
+        loveCities = [];localStorage.setItem("loveCities","");location.reload();
+    }
+}
+
 function check(){
     let val = document.getElementById('pwd').value;
     if(val === correct){
@@ -476,6 +555,18 @@ function check(){
                     </div>
                     <p class="memo" style="font-size:14px">每天只能打卡一次哦</p>
                 </div>
+
+                <!-- 新增：恋爱地图模块 -->
+                <div class="map-box">
+                    <p class="date-title">🗺️ 恋爱地图 · 我们走过的地方</p>
+                    <div id="loveMap"></div>
+                    <input class="map-input" id="cityInput" placeholder="输入城市名（北京/厦门/上海等）">
+                    <button class="btn" onclick="addLoveCity()">✨ 点亮这座城市</button>
+                    <button class="btn" onclick="clearLoveCities()">🗑️ 清空足迹</button>
+                    <div style="margin-top:12px">
+                        ${loveCities.map(c=>`<span class="city-item">${c.name}</span>`).join("")}
+                    </div>
+                </div>
             </div>`;
 
             const wishList = document.getElementById("wish-list");
@@ -504,6 +595,8 @@ function check(){
                 </div>`;
             });
             typeWriter(loveLetter, "loveLetter", 80);
+            // 初始化恋爱地图
+            initLoveMap();
 
             window.addMiss = function(){missCount++;localStorage.setItem("missCount",missCount);document.getElementById("miss-num").innerText = missCount;}
             window.refreshWord = function(){location.reload();}
